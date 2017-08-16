@@ -1,0 +1,1739 @@
+{
+  "swagger": "2.0",
+  "schemes": [
+    "https"
+  ],
+  "host": "api.sandbox.paypal.com",
+  "basePath": "/v1/payments",
+  "info": {
+    "contact": {
+      "name": "PayPal PaymentsAPI",
+      "url": "https://paypal.com"
+    },
+    "description": "Manipulates PayPal PaymentsAPI for sandbox payments and credit cards.",
+    "license": {
+      "name": "Creative Commons Attribution 3.0",
+      "url": "http://creativecommons.org/licenses/by/3.0/"
+    },
+    "termsOfService": "https://www.paypal.com/us/webapps/mpp/ua/xdeveloper-full",
+    "title": "PayPal PaymentsAPI",
+    "version": "v1"
+  },
+  "externalDocs": {
+    "url": "https://developer.paypal.com/docs/api/"
+  },
+  "securityDefinitions": {
+    "Oauth2c": {
+      "authorizationUrl": "https://www.sandbox.paypal.com/signin/authorize",
+      "description": "Oauth 2.0 accessCode authentication",
+      "flow": "application",
+      "scopes": {
+        "https://api.paypal.com/v1/payments": "Payments"
+      },
+      "tokenUrl": "https://api.sandbox.paypal.com/v1/oauth2/token",
+      "type": "oauth2"
+    }
+  },
+  "tags": [
+    {
+      "name": "payments"
+    }
+  ],
+  "paths": {
+    "/payment": {
+      "post": {
+        "description": "Creates a sale, an authorized payment to be captured later, or an order.",
+        "operationId": "createPayment",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "paymentObject",
+            "in": "body",
+            "description": "Object containing required payment information",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PaymentObject"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/PaymentObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "payments"
+        ]
+      },
+      "get": {
+        "description": "Lists payments that were created by the create payment call and that are in any state.",
+        "operationId": "listPayments",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "count",
+            "in": "query",
+            "description": "The number of items to list in the response.",
+            "type": "string"
+          },
+          {
+            "name": "start_id",
+            "in": "query",
+            "description": "The ID of the starting resource in the response. When results are paged, you can use the next_id value as the start_id to continue with the next set of results.",
+            "type": "string"
+          },
+          {
+            "name": "start_index",
+            "in": "query",
+            "description": "The start index of the payments to list.",
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "start_time",
+            "in": "query",
+            "description": "The start date and time for the range to show in the response, in Internet date and time format.",
+            "type": "string"
+          },
+          {
+            "name": "end_time",
+            "in": "query",
+            "description": "The end date and time for the range to show in the response, in Internet date and time format.",
+            "type": "string"
+          },
+          {
+            "name": "payee_id",
+            "in": "query",
+            "description": "Filters the payments in the response by a PayPal-assigned merchant ID that identifies the payee.",
+            "type": "string"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Sorts the payments in the response by a create time.",
+            "type": "string",
+            "enum": [
+              "create_time"
+            ]
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "description": "Sorts the payments in the response in descending order.",
+            "type": "string",
+            "enum": [
+              "desc"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/PaymentObjectArray"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "payments"
+        ]
+      }
+    },
+    "/payment/{payment_id}": {
+      "get": {
+        "description": "Shows details for a payment, by ID, that has yet to complete. For example, shows details for a payment that was created, approved, or failed.",
+        "operationId": "detailPayment",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "description": "Payment id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/PaymentObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "payments"
+        ]
+      }
+    },
+    "/payment/{payment_id}/execute": {
+      "post": {
+        "description": "Executes a PayPal payment that the customer has approved. You can optionally update one or more transactions when you execute the payment.",
+        "operationId": "executePayment",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "description": "Payment id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "payer_id_object",
+            "in": "body",
+            "description": "Object containing the payer id",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PayerIdObject"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/PaymentObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "payments"
+        ]
+      }
+    },
+    "/authorization/{authorization_id}": {
+      "get": {
+        "description": "Shows details for an authorization, by ID.",
+        "operationId": "detailAuthorization",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "authorization_id",
+            "in": "path",
+            "description": "Authorization id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "authorizations"
+        ]
+      }
+    },
+    "/authorization/{authorization_id}/capture": {
+      "post": {
+        "description": "Captures and processes an authorization, by ID. To use this call, the original payment call must specify an intent of authorize.",
+        "operationId": "captureAuthorization",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "authorization_id",
+            "in": "path",
+            "description": "The ID of the authorization to capture.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "in": "body",
+            "description": "The amount to capture. If the amount matches the orginally authorized amount, the state of the authorization changes to captured. Otherwise, the state of the authorization changes to partially_captured.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/XAmountObject"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/CaptureObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "authorizations"
+        ]
+      }
+    },
+    "/authorization/{authorization_id}/void": {
+      "post": {
+        "description": "Voids, or cancels, an authorization, by ID. You cannot void a fully captured authorization.",
+        "operationId": "voidAuthorization",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "authorization_id",
+            "in": "path",
+            "description": "The ID of the authorization to void.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "authorizations"
+        ]
+      }
+    },
+    "/authorization/{authorization_id}/reauthorize": {
+      "post": {
+        "description": "Re-authorizes a PayPal account payment, by authorization ID. To ensure that funds are still available, re-authorize a payment after the initial three-day honor period. Supports only the amount request parameter. You can re-authorize a payment only once from four to 29 days after three-day honor period for the original authorization expires. If 30 days have passed from the original authorization, you must create a new authorization instead. A re-authorized payment itself has a new three-day honor period. You can re-authorize a transaction once for up to 115% of the originally authorized amount, not to exceed an increase of $75 USD.",
+        "operationId": "reauthorizeAuthorization",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "authorization_id",
+            "in": "path",
+            "description": "The ID of the authorization to reauthorize.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "in": "body",
+            "description": "The amount to capture. If the amount matches the orginally authorized amount, the state of the authorization changes to captured. Otherwise, the state of the authorization changes to partially_captured.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/XAmountObject"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "authorizations"
+        ]
+      }
+    },
+    "/sale/{sale_id}": {
+      "get": {
+        "description": "Shows details for a sale, by ID. Returns only sales that were created through the REST API.",
+        "operationId": "detailSale",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "sale_id",
+            "in": "path",
+            "description": "The ID of the sale for which to show details.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/SaleObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "sales"
+        ]
+      }
+    },
+    "/sale/{sale_id}/refund": {
+      "post": {
+        "description": "Refunds a sale, by ID. For a full refund, include an empty payload in the JSON request body. For a partial refund, include an amount object in the JSON request body.",
+        "operationId": "refundSale",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "sale_id",
+            "in": "path",
+            "description": "The ID of the sale for which to show details.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "in": "body",
+            "description": "The amount to capture. If the amount matches the orginally authorized amount, the state of the authorization changes to captured. Otherwise, the state of the authorization changes to partially_captured.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/XAmountObject"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/RefundObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "sales"
+        ]
+      }
+    },
+    "/refund/{refund_id}": {
+      "get": {
+        "description": "Shows details for a refund, by ID.",
+        "operationId": "detailRefund",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "refund_id",
+            "in": "path",
+            "description": "The ID of the refund for which to show details.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/RefundObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "refunds"
+        ]
+      }
+    },
+    "/capture/{capture_id}": {
+      "get": {
+        "description": "Shows details for a captured payment, by ID.",
+        "operationId": "detailCapture",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "capture_id",
+            "in": "path",
+            "description": "The ID of the capture for which to show details.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/CaptureObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "captures"
+        ]
+      }
+    },
+    "/capture/{capture_id}/refund": {
+      "post": {
+        "description": "Refunds a captured payment, by ID. In the JSON request body, include an amount object.",
+        "operationId": "refundCapture",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "capture_id",
+            "in": "path",
+            "description": "The ID of the capture for which to refund.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "in": "body",
+            "description": "The amount to refund. If the amount matches the orginally authorized amount, the state of the authorization changes to captured. Otherwise, the state of the authorization changes to partially_captured.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/XAmountObject"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/RefundObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "captures"
+        ]
+      }
+    },
+    "/orders/{order_id}": {
+      "get": {
+        "description": "Shows details for an order, by ID.",
+        "operationId": "detailOrder",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "description": "The ID of the order for which to show details.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/OrderObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "orders"
+        ]
+      }
+    },
+    "/orders/{order_id}/authorize": {
+      "post": {
+        "description": "Authorizes an order, by ID. In the JSON request body, include an amount object.",
+        "operationId": "authorizeOrder",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "description": "The ID of the order for which to show details.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "in": "body",
+            "description": "The amount to collect.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/XAmountObject"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/AuthorizationObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "orders"
+        ]
+      }
+    },
+    "/orders/{order_id}/capture": {
+      "post": {
+        "description": "Captures a payment for an order, by ID. To use this call, the original payment call must specify an order intent. In the JSON request body, include the payment amount and indicate whether this capture is the final capture for the authorization.",
+        "operationId": "captureOrder",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "description": "The ID of the order for which to show details.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "in": "body",
+            "description": "The amount to capture. If the amount matches the orginally authorized amount, the state of the authorization changes to captured. Otherwise, the state of the authorization changes to partially_captured.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/XAmountObject"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/CaptureObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "orders"
+        ]
+      }
+    },
+    "/orders/{order_id}/do-void": {
+      "post": {
+        "description": "Voids, or cancels, an order, by ID. You cannot void an order if the payment has already been partially or fully captured.",
+        "operationId": "voidOrder",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "description": "The ID of the order for which to show details.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/OrderObject"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://api.paypal.com/v1/payments"
+            ]
+          }
+        ],
+        "tags": [
+          "orders"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "RelatedResourcesObject": {
+      "properties": {
+        "sale": {
+          "$ref": "#/definitions/SaleObject"
+        },
+        "authorization": {
+          "$ref": "#/definitions/AuthorizationObject"
+        },
+        "order": {
+          "$ref": "#/definitions/OrderObject"
+        },
+        "capture": {
+          "$ref": "#/definitions/CaptureObject"
+        },
+        "refund": {
+          "$ref": "#/definitions/RefundObject"
+        }
+      },
+      "type": "object"
+    },
+    "ItemObject": {
+      "properties": {
+        "sku": {
+          "type": "string",
+          "description": "The stock keeping unit (SKU) for the item."
+        },
+        "name": {
+          "type": "string",
+          "description": "The item name. Maximum length is 127 characters."
+        },
+        "description": {
+          "type": "string",
+          "description": "The item description. Supported for the PayPal payment method only."
+        },
+        "quantity": {
+          "type": "string",
+          "description": "The item quantity. Maximum length is 10 characters."
+        },
+        "price": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string",
+          "description": "The three-character ISO-4217 currency code."
+        },
+        "tax": {
+          "type": "string",
+          "description": "The item tax. Supported for the PayPal payment method only."
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL to item information. Available to the payer in the transaction history."
+        }
+      },
+      "type": "object"
+    },
+    "ShippingAddressObject": {
+      "properties": {
+        "line1": {
+          "type": "string"
+        },
+        "line2": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "country_code": {
+          "type": "string",
+          "description": "The two-character country code."
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string",
+          "description": "The two-letter code for US states or the equivalent for other countries. Maximum length is 100 characters."
+        },
+        "phone": {
+          "type": "string"
+        },
+        "normalization_status": {
+          "type": "string",
+          "description": "The address normalization status. Returned only for payers from Brazil."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of address."
+        }
+      },
+      "type": "object"
+    },
+    "PaymentOptions": {
+      "properties": {
+        "allowed_payment_method": {
+          "type": "string",
+          "description": "The payment method requested for this transaction. This field does not apply to the credit card payment method."
+        }
+      },
+      "type": "object"
+    },
+    "ItemList": {
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ItemObject"
+          }
+        },
+        "shipping_address": {
+          "$ref": "#/definitions/ShippingAddressObject"
+        },
+        "shipping_method": {
+          "type": "string",
+          "description": "The shipping method used for this payment, such as USPS Parcel."
+        },
+        "shipping_phone_number": {
+          "type": "string",
+          "description": "The shipping phone number, in its canonical international format as defined by the E.164 numbering plan. Enables merchants to share payer’s contact number with PayPal for the current payment. The final contact number for the payer who is associated with the transaction might be the same as or different from the shipping_phone_number based on the payer’s action on PayPal."
+        }
+      },
+      "type": "object"
+    },
+    "DisplayPhone": {
+      "properties": {
+        "country_code": {
+          "type": "string",
+          "description": "The country code in E.164 format."
+        },
+        "number": {
+          "type": "string",
+          "description": "The in-country phone number in E.164 format."
+        }
+      },
+      "type": "object"
+    },
+    "PayeeMetaDataInfo": {
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The email address for the payer. Maximum length is 127 characters."
+        },
+        "display_phone": {
+          "$ref": "#/definitions/DisplayPhone"
+        },
+        "brand_name": {
+          "type": "string",
+          "description": "The payer's business name."
+        }
+      },
+      "type": "object"
+    },
+    "PayeeObject": {
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The email address associated with the payee's PayPal account. If the provided email address is not associated with any PayPal account, the payee can only receive PayPal Wallet payments. Direct credit card payments are denied due to card compliance requirements."
+        },
+        "merchant_id": {
+          "type": "string",
+          "description": "The PayPal account ID for the payee."
+        },
+        "payee_display_metadata": {
+          "$ref": "#/definitions/PayeeMetaDataInfo"
+        }
+      },
+      "type": "object"
+    },
+    "OrderObject": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The ID of the order transaction."
+        },
+        "reference_id": {
+          "type": "string",
+          "description": "The ID of the purchase unit that is associated with this object. Obsolete. Used only in cart_base."
+        },
+        "amount": {
+          "$ref": "#/definitions/AmountObject"
+        },
+        "payment_mode": {
+          "type": "string",
+          "description": "The transaction payment mode."
+        },
+        "state": {
+          "type": "string",
+          "description": "The order transaction state."
+        },
+        "reason_code": {
+          "type": "string",
+          "description": "The reason code that describes why the transaction state is pending or reversed. Eventually, this parameter will replace the pending_reason parameter. Supported only when the payment_method is paypal."
+        },
+        "protection_eligibility": {
+          "type": "string",
+          "description": "The level of seller protection in effect for the transaction."
+        },
+        "protection_eligibility_type": {
+          "type": "string",
+          "description": "The kind of seller protection in effect for the transaction. Returned only when the protection_eligibility property is ELIGIBLE or PARTIALLY_ELIGIBLE. Supported only when the payment_method is paypal"
+        },
+        "parent_payment": {
+          "type": "string",
+          "description": "The ID of the payment on which this transaction is based."
+        },
+        "create_time": {
+          "type": "string",
+          "description": "The date and time when the resource was created, , in Internet date and time format."
+        },
+        "update_time": {
+          "type": "string",
+          "description": "The date and time when the resource was last updated, in Internet date and time format."
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LinkObject"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "CurrencyObject": {
+      "properties": {
+        "currency": {
+          "type": "string",
+          "description": "The three-character ISO-4217 currency code. PayPal does not support all currencies."
+        },
+        "value": {
+          "type": "string",
+          "description": "The amount, up to N digits after the decimal separator, as defined in ISO 4217 for the appropriate currency code."
+        }
+      },
+      "type": "object"
+    },
+    "SaleObject": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The ID of the sale transaction."
+        },
+        "amount": {
+          "$ref": "#/definitions/AmountObject"
+        },
+        "payment_mode": {
+          "type": "string",
+          "description": "The transaction payment mode. Supported only when payment_method is paypal."
+        },
+        "state": {
+          "type": "string",
+          "description": "The sale transaction state."
+        },
+        "reason_code": {
+          "type": "string",
+          "description": "The reason code that describes why the transaction state is pending or reversed. Supported only when the payment_method is paypal."
+        },
+        "protection_eligibility": {
+          "type": "string",
+          "description": "The seller protection level in effect for the transaction. Supported only when the payment_method is paypal."
+        },
+        "protection_eligibility_type": {
+          "type": "string",
+          "description": "The seller protection type in effect for the transaction. Returned only when protection_eligibility is ELIGIBLE or PARTIALLY_ELIGIBLE. Supported only when the payment_method is paypal."
+        },
+        "clearing_time": {
+          "type": "string",
+          "description": "The date and time when the eCheck transaction is expected to clear. Returned for eCheck payments. Supported only when the payment_method is paypal."
+        },
+        "transaction_fee": {
+          "$ref": "#/definitions/TransactionFeeObject"
+        },
+        "receivable_amount": {
+          "$ref": "#/definitions/CurrencyObject"
+        },
+        "exchange_rate": {
+          "type": "string",
+          "description": "The exchange rate for this transaction. Returned only in cross-currency use cases where a merchant bills a buyer in a non-primary currency for that buyer."
+        },
+        "receipt_id": {
+          "type": "string",
+          "description": "The receipt ID, which is a payment ID number that is returned for guest users to identify the payment."
+        },
+        "parent_payment": {
+          "type": "string",
+          "description": "The ID of the payment on which this transaction is based."
+        },
+        "processor_response": {
+          "$ref": "#/definitions/ProcessorResponseObject"
+        },
+        "billing_agreement_id": {
+          "type": "string",
+          "description": "The ID of the billing agreement. Used as reference to execute this transaction."
+        },
+        "create_time": {
+          "type": "string",
+          "description": "The date and time of the sale, in Internet date and time format as defined in RFC 3339 Section 5.6."
+        },
+        "update_time": {
+          "type": "string",
+          "description": "The date and time when the resource was last updated, in Internet date and time format in RFC 3339 Section 5.6."
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LinkObject"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "RefundObject": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The ID of the refund transaction. Maximum length is 17 characters."
+        },
+        "amount": {
+          "$ref": "#/definitions/AmountObject"
+        },
+        "state": {
+          "type": "string",
+          "description": "The state of the refund."
+        },
+        "reason": {
+          "type": "string",
+          "description": "The reason that the transaction is being refunded."
+        },
+        "invoice_number": {
+          "type": "string",
+          "description": "Your own invoice or tracking ID number."
+        },
+        "sale_id": {
+          "type": "string",
+          "description": "The ID of the sale transaction being refunded."
+        },
+        "capture_id": {
+          "type": "string",
+          "description": "The ID of the sale transaction being refunded."
+        },
+        "parent_payment": {
+          "type": "string",
+          "description": "The ID of the payment on which this transaction is based."
+        },
+        "description": {
+          "type": "string",
+          "description": "The refund description."
+        },
+        "create_time": {
+          "type": "string",
+          "description": "The date and time when the refund was created, in Internet date and time format."
+        },
+        "update_time": {
+          "type": "string",
+          "description": "The date and time when the resource was last updated, in Internet date and time format."
+        },
+        "reason_code": {
+          "type": "string",
+          "description": "The reason code for the pending refund state."
+        },
+        "refund_reason_code": {
+          "type": "string",
+          "description": "The PayPal-assigned reason codes for the refund."
+        },
+        "refund_funding_type": {
+          "type": "string",
+          "description": "Indicates whether the refund amount is funded by the payee's funding account or another funding account."
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LinkObject"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "ProcessorResponseObject": {
+      "properties": {
+        "response_code": {
+          "type": "string",
+          "description": "The PayPal normalized response code, which is generated from the processor's specific response code."
+        },
+        "avs_code": {
+          "type": "string",
+          "description": "The Address Verification System (AVS) response code."
+        },
+        "cvv_code": {
+          "type": "string",
+          "description": "The CVV system response code."
+        },
+        "advice_code": {
+          "type": "string",
+          "description": "The merchant advice on how to handle declines for recurring payments."
+        },
+        "eci_submitted": {
+          "type": "string",
+          "description": "The processor-provided authorization response."
+        },
+        "vpas": {
+          "type": "string",
+          "description": "The processor-provided Visa Payer Authentication Service status."
+        }
+      },
+      "type": "object"
+    },
+    "AuthorizationObject": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The ID of the authorization."
+        },
+        "amount": {
+          "$ref": "#/definitions/AmountObject"
+        },
+        "payment_mode": {
+          "type": "string",
+          "description": "The payment mode of the authorization."
+        },
+        "state": {
+          "type": "string",
+          "description": "The authorization state."
+        },
+        "reason_code": {
+          "type": "string",
+          "description": "The reason code for the pending transaction state."
+        },
+        "protection_eligibility": {
+          "type": "string",
+          "description": "The level of seller protection present for the transaction. Supported for the PayPal payment method only."
+        },
+        "protection_eligibility_type": {
+          "type": "string",
+          "description": "The type of seller protection present for the transaction. Returned only when the protection_eligibility property is ELIGIBLE or PARTIALLY_ELIGIBLE. Supported for the PayPal payment method only"
+        },
+        "parent_payment": {
+          "type": "string",
+          "description": "The ID of the payment resource on which this transaction is based."
+        },
+        "processor_response": {
+          "$ref": "#/definitions/ProcessorResponseObject"
+        },
+        "valid_until": {
+          "type": "string",
+          "description": "The date and time when the authorization expires, in Internet date and time format."
+        },
+        "create_time": {
+          "type": "string",
+          "description": "The date and time when the authorization was created, in Internet date and time format."
+        },
+        "update_time": {
+          "type": "string",
+          "description": "The date and time when the authorization was last updated, in Internet date and time format."
+        },
+        "reference_id": {
+          "type": "string",
+          "description": "The ID of the purchase or transaction unit that corresponds to this authorization transaction."
+        },
+        "receipt_id": {
+          "type": "string",
+          "description": "The receipt ID, which identifies the payment. Value is 16-digit numeric payment ID number that is returned for guest users"
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LinkObject"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "PayerIdObject": {
+      "properties": {
+        "payer_id": {
+          "type": "string",
+          "description": "The Payer ID returned from a payment approval."
+        }
+      },
+      "type": "object"
+    },
+    "XAmountObject": {
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/AmountObject"
+        },
+        "is_final_capture": {
+          "type": "boolean",
+          "description": "Indicates whether to release all remaining funds that the authorization holds in the funding instrument (FI). Default is false."
+        }
+      },
+      "type": "object"
+    },
+    "TransactionFeeObject": {
+      "properties": {
+        "currency": {
+          "type": "string",
+          "description": "The three-character ISO-4217 currency code. PayPal does not support all currencies."
+        },
+        "value": {
+          "type": "string",
+          "description": "The amount, up to N digits after the decimal separator, as defined in ISO 4217 for the appropriate currency code."
+        }
+      },
+      "type": "object"
+    },
+    "CaptureObject": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The ID of the capture transaction."
+        },
+        "amount": {
+          "$ref": "#/definitions/AmountObject"
+        },
+        "is_final_capture": {
+          "type": "boolean",
+          "description": "Indicates whether to release all remaining funds that the authorization holds in the funding instrument (FI). Default is false."
+        },
+        "state": {
+          "type": "string",
+          "description": "The captured state"
+        },
+        "reason_code": {
+          "type": "string",
+          "description": "The reason code that describes why the transaction state is pending or reversed."
+        },
+        "parent_payment": {
+          "type": "string",
+          "description": "The ID of the payment on which this transaction is based."
+        },
+        "invoice_number": {
+          "type": "string",
+          "description": "The invoice number to track this payment."
+        },
+        "transaction_fee": {
+          "$ref": "#/definitions/TransactionFeeObject"
+        },
+        "create_time": {
+          "type": "string",
+          "description": "The date and time when the capture occurred, in Internet date and time format as defined in RFC 3339 Section 5.6."
+        },
+        "update_time": {
+          "type": "string",
+          "description": "The date and time when the resource was last updated, in Internet date and time format as defined in RFC 3339 Section 5.6."
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LinkObject"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "PaymentObjectArray": {
+      "properties": {
+        "payments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PaymentObject"
+          }
+        },
+        "next_id": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "type": "object"
+    },
+    "BillingAddressObject": {
+      "properties": {
+        "line1": {
+          "type": "string"
+        },
+        "line2": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "country_code": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "PayerInfoObject": {
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "salutation": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "middle_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "suffix": {
+          "type": "string"
+        },
+        "payer_id": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "phone_type": {
+          "type": "string",
+          "enum": [
+            "HOME",
+            "WORK",
+            "MOBILE",
+            "OTHER"
+          ]
+        },
+        "birth_date": {
+          "type": "string"
+        },
+        "tax_id": {
+          "type": "string"
+        },
+        "tax_id_type": {
+          "type": "string",
+          "enum": [
+            "BR_CPF",
+            "BR_CNPJ"
+          ]
+        },
+        "country_code": {
+          "type": "string"
+        },
+        "billing_address": {
+          "$ref": "#/definitions/BillingAddressObject"
+        }
+      },
+      "type": "object"
+    },
+    "LinkObject": {
+      "properties": {
+        "href": {
+          "type": "string"
+        },
+        "rel": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "RedirectURLsObject": {
+      "properties": {
+        "return_url": {
+          "type": "string"
+        },
+        "cancel_url": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "CreditCardObject": {
+      "required": [
+        "number",
+        "type",
+        "expire_month",
+        "expire_year"
+      ],
+      "properties": {
+        "number": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "expire_month": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "expire_year": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "cvv2": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "FundingInstrumentObject": {
+      "properties": {
+        "credit_card": {
+          "$ref": "#/definitions/CreditCardObject"
+        }
+      },
+      "type": "object"
+    },
+    "AmountObject": {
+      "properties": {
+        "currency": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "TransactionObject": {
+      "required": [
+        "amount"
+      ],
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/AmountObject"
+        },
+        "reference_id": {
+          "type": "string",
+          "description": "Optional. The merchant-provided ID for the purchase unit."
+        },
+        "payee": {
+          "$ref": "#/definitions/PayeeObject"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of what is being paid for."
+        },
+        "note_to_payee": {
+          "type": "string",
+          "description": "An optional note to the recipient of the funds in this transaction."
+        },
+        "custom": {
+          "type": "string",
+          "description": "A free-form field for clients' use."
+        },
+        "invoice_number": {
+          "type": "string",
+          "description": "The invoice number to track this payment."
+        },
+        "purchase_order": {
+          "type": "string",
+          "description": "purchase order is number or id specific to this payment"
+        },
+        "soft_descriptor": {
+          "type": "string",
+          "description": "The soft descriptor that is used when charging this funding source. If the string's length is greater than the maximum allowed length, the string is truncated."
+        },
+        "payment_options": {
+          "$ref": "#/definitions/PaymentOptions"
+        },
+        "item_list": {
+          "$ref": "#/definitions/ItemList"
+        },
+        "notify_url": {
+          "type": "string",
+          "description": "The URL to send payment notifications."
+        },
+        "order_url": {
+          "type": "string",
+          "description": "The URL on the merchant site related to this payment."
+        },
+        "related_resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RelatedResourcesObject"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "PayerObject": {
+      "required": [
+        "payment_method"
+      ],
+      "properties": {
+        "payment_method": {
+          "type": "string",
+          "enum": [
+            "credit_card",
+            "paypal"
+          ]
+        },
+        "funding_instruments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FundingInstrumentObject"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "VERIFIED",
+            "UNVERIFIED"
+          ]
+        },
+        "payer_info": {
+          "$ref": "#/definitions/PayerInfoObject"
+        }
+      },
+      "type": "object"
+    },
+    "PaymentObject": {
+      "required": [
+        "intent",
+        "payer"
+      ],
+      "properties": {
+        "oauth_access_code": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "create_time": {
+          "type": "string"
+        },
+        "update_time": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LinkObject"
+          }
+        },
+        "intent": {
+          "type": "string",
+          "enum": [
+            "sale",
+            "authorize",
+            "order"
+          ]
+        },
+        "payer": {
+          "$ref": "#/definitions/PayerObject"
+        },
+        "transactions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TransactionObject"
+          }
+        },
+        "experience_profile_id": {
+          "type": "string",
+          "description": "Id of the experience profile to use during checkout."
+        },
+        "note_to_payer": {
+          "type": "string"
+        },
+        "redirect_urls": {
+          "$ref": "#/definitions/RedirectURLsObject"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

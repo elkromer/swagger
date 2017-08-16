@@ -1,0 +1,479 @@
+{
+  "swagger": "2.0",
+  "schemes": [
+    "https"
+  ],
+  "host": "api.sandbox.paypal.com",
+  "basePath": "/v1/payments",
+  "info": {
+    "contact": {
+      "name": "PayPal Payouts API",
+      "url": "https://developer.paypal.com/docs/api/payments.payouts-batch"
+    },
+    "description": "Use the Payouts API to make PayPal payments to multiple PayPal accounts in a single API call. You can specify the recipients by using their PayPal email addresses, phone numbers, or encrypted PayPal account numbers.",
+    "license": {
+      "name": "Creative Commons Attribution 3.0",
+      "url": "http://creativecommons.org/licenses/by/3.0/"
+    },
+    "termsOfService": "https://www.paypal.com/us/webapps/mpp/ua/xdeveloper-full",
+    "title": "PayPal Payouts API",
+    "version": "v1"
+  },
+  "externalDocs": {
+    "url": "https://developer.paypal.com/docs/api/"
+  },
+  "securityDefinitions": {
+    "Oauth2": {
+      "authorizationUrl": "https://www.sandbox.paypal.com/signin/authorize",
+      "description": "Oauth 2.0 implicit authentication",
+      "flow": "implicit",
+      "scopes": {
+        "https://uri.paypal.com/services/payments/payouts": "Payouts",
+        "openid": "Login"
+      },
+      "tokenUrl": "https://api.sandbox.paypal.com/v1/oauth2/token",
+      "type": "oauth2"
+    },
+    "Oauth2c": {
+      "authorizationUrl": "https://www.sandbox.paypal.com/signin/authorize",
+      "description": "Oauth 2.0 accessCode authentication",
+      "flow": "accessCode",
+      "scopes": {
+        "https://uri.paypal.com/services/payments/payouts": "Payouts",
+        "openid": "Login"
+      },
+      "tokenUrl": "https://api.sandbox.paypal.com/v1/oauth2/token",
+      "type": "oauth2"
+    }
+  },
+  "tags": [
+    {
+      "name": "payouts"
+    }
+  ],
+  "paths": {
+    "/payouts": {
+      "post": {
+        "description": "You can make payouts to one or more PayPal accounts. By default, a Payouts API call is asynchronous, which lets you show payout details at a later time. See Batch payouts. Deprecation notice: Synchronous mode will soon be deprecated and is no longer available for new integrations but continues to be supported for existing integrations. A synchronous mode payout immediately returns the results of the payout.",
+        "operationId": "createPayouts",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "sync_mode",
+            "in": "query",
+            "description": "Indicates whether to return an immediate and synchronous response or an asynchronous response in the background. Set to true to return an immediate and synchronous response. Default is false. Deprecation notice: Synchronous mode will soon be deprecated and is no longer available for new integrations but continues to be supported for existing integrations. A synchronous mode payout immediately returns the results of the payout.",
+            "type": "boolean"
+          },
+          {
+            "name": "payoutBatchRequest",
+            "in": "body",
+            "description": "The sender-provided batch header for a batch payout request.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PayoutsBatchRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/PayoutsBatchResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://uri.paypal.com/services/payments/payouts"
+            ]
+          }
+        ],
+        "tags": [
+          "payouts"
+        ]
+      }
+    },
+    "/payouts/{payout_batch_id}": {
+      "get": {
+        "description": "Periodically shows the latest status of a batch payout along with the transaction status and other data for individual items. Also, returns IDs for the individual payout items. You can use these item IDs in other calls. For example, specify the ID of a payout item to Show payout item details.",
+        "operationId": "showBatchPayoutDetails",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "payout_batch_id",
+            "in": "path",
+            "description": "The ID of the batch payout for which to show status. You can use the payout_batch_id value that the create batch payout request created.",
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Optional. Shows details for only the specified fields.",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/PayoutsBatchResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://uri.paypal.com/services/payments/payouts"
+            ]
+          }
+        ],
+        "tags": [
+          "payouts"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "BatchEnum": {
+      "properties": {
+        "batch_enum": {
+          "type": "string",
+          "description": "The batch payouts status.",
+          "enum": [
+            "ACKNOWLEDGED",
+            "DENIED",
+            "PENDING",
+            "PROCESSING",
+            "SUCCESS",
+            "NEW",
+            "CANCELED"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "BatchStatus": {
+      "properties": {
+        "batch_header": {
+          "description": "A batch header. Includes the generated batch status.",
+          "$ref": "#/definitions/PayoutBatchHeader"
+        },
+        "items": {
+          "type": "array",
+          "description": "The payout item status and other details.",
+          "items": {
+            "$ref": "#/definitions/PayoutItemDetails"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "Currency": {
+      "properties": {
+        "currency": {
+          "description": "3 letter currency code",
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "description": "amount upto 2 decimals represented as string"
+        }
+      },
+      "type": "object"
+    },
+    "Error": {
+      "properties": {
+        "name": {
+          "description": "Human readable, unique name of the error.",
+          "type": "string"
+        },
+        "debug_id": {
+          "type": "string",
+          "description": "PayPal internal identifier used for correlation purposes."
+        },
+        "message": {
+          "type": "string",
+          "description": "Message describing the error."
+        },
+        "information_link": {
+          "type": "string",
+          "description": "URI for detailed information related to this error for the developer."
+        },
+        "details": {
+          "type": "array",
+          "description": "Details about a specific error.",
+          "items": {
+            "$ref": "#/definitions/ErrorDetails"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "ErrorDetails": {
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "Name of the field that caused the error."
+        },
+        "issue": {
+          "type": "string",
+          "description": "Reason for the error."
+        }
+      },
+      "type": "object"
+    },
+    "JsonPatch": {
+      "properties": {
+        "op": {
+          "type": "string",
+          "description": "The operation to perform.",
+          "enum": [
+            "add",
+            "remove",
+            "replace",
+            "move",
+            "copy",
+            "test"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "description": "A JSON pointer. References a location in the target document where the operation is performed."
+        },
+        "value": {
+          "type": "object",
+          "description": "The value to apply. The remove operation does not require a value."
+        },
+        "from": {
+          "type": "string",
+          "description": "A JSON pointer. References the location in the target document from which to move the value. Required for the move operation."
+        }
+      },
+      "type": "object"
+    },
+    "JsonPatchRequest": {
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "A JSON patch object that you can use to apply partial updates to resources.",
+          "items": {
+            "$ref": "#/definitions/JsonPatch"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "Link": {
+      "properties": {
+        "href": {
+          "type": "string",
+          "description": "The URL of the related HATEOAS link that you can use for subsequent calls."
+        },
+        "rel": {
+          "type": "string",
+          "description": "The link relationship. Describes how this link relates to the previous call. For example, use a self link to show details for the current call. Use a parent_payment link to show details for the parent payment. The rel value can also be a related call, such as execute or refund."
+        },
+        "method": {
+          "type": "string",
+          "description": "The HTTP method required to make the related call."
+        }
+      },
+      "type": "object"
+    },
+    "PayoutBatchHeader": {
+      "properties": {
+        "payout_batch_id": {
+          "type": "string",
+          "description": "The PayPal-generated ID for a batch payout."
+        },
+        "batch_status": {
+          "$ref": "#definitions/BatchEnum"
+        },
+        "time_created": {
+          "type": "string",
+          "description": "The date and time when processing for the batch payout began, in Internet date and time format."
+        },
+        "time_completed": {
+          "type": "string",
+          "description": "The date and time when processing for the batch payout completed, in Internet date and time format."
+        },
+        "sender_batch_header": {
+          "$ref": "#definitions/SenderBatchHeader"
+        },
+        "amount": {
+          "$ref": "#definitions/Currency"
+        },
+        "fees": {
+          "$ref": "#definitions/Currency"
+        },
+        "errors": {
+          "$ref": "#definitions/Error"
+        }
+      },
+      "type": "object"
+    },
+    "PayoutItem": {
+      "properties": {
+        "recipient_type": {
+          "$ref": "#/definitions/RecipientEnum"
+        },
+        "amount": {
+          "$ref": "#definitions/Currency"
+        },
+        "note": {
+          "type": "string",
+          "description": "Optional. A sender-specified note for notifications. Value is any string value."
+        },
+        "receiver": {
+          "type": "string",
+          "description": "The receiver of the payment. Corresponds to the recipient_type value in the request."
+        },
+        "sender_item_id": {
+          "type": "string",
+          "description": "A sender-specified ID number. Tracks the batch payout in an accounting system."
+        }
+      },
+      "type": "object"
+    },
+    "PayoutItemDetails": {
+      "properties": {
+        "payout_item_id": {
+          "type": "string",
+          "description": "The ID for the payout item. Viewable when you show details for a batch payout."
+        },
+        "transaction_id": {
+          "type": "string",
+          "description": "The PayPal-generated ID for the transaction."
+        },
+        "transaction_status": {
+          "$ref": "#definitions/TransactionEnum"
+        },
+        "payout_item_fee": {
+          "$ref": "#definitions/Currency"
+        },
+        "payout_batch_id": {
+          "type": "string",
+          "description": "The PayPal-generated ID for the batch payout."
+        },
+        "sender_batch_id": {
+          "type": "string",
+          "description": "A sender-specified ID number. Tracks the batch payout in an accounting system."
+        },
+        "payout_item": {
+          "$ref": "#definitions/PayoutItem"
+        },
+        "time_processed": {
+          "type": "string",
+          "description": "The date and time when this item was last processed, in Internet date and time format."
+        },
+        "errors": {
+          "$ref": "#definitions/Error"
+        },
+        "links": {
+          "type": "array",
+          "description": "HATEOAS links related to this call.",
+          "items": {
+            "$ref": "#definitions/Link"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "PayoutsBatchRequest": {
+      "properties": {
+        "sender_batch_header": {
+          "$ref": "#definitions/SenderBatchHeader"
+        },
+        "items": {
+          "type": "array",
+          "description": "A sender-created payout to a single recipient.",
+          "items": {
+            "$ref": "#definitions/PayoutItem"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "PayoutsBatchResponse": {
+      "properties": {
+        "batch_header": {
+          "$ref": "#definitions/PayoutBatchHeader"
+        },
+        "items": {
+          "type": "array",
+          "description": "A sender-created payout to a single recipient.",
+          "items": {
+            "$ref": "#definitions/PayoutItem"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "RecipientEnum": {
+      "properties": {
+        "recipient_enum": {
+          "type": "string",
+          "description": "The type of ID that identifies the payment receiver. Value is: EMAIL- Unencrypted email. Value is a string of up to 127 single-byte characters. PHONE- Unencrypted phone number. Note: The PayPal sandbox does not support the PHONE recipient type. PAYPAL_ID- Encrypted PayPal account number. If the sender_batch_header includes the recipient_type attribute, any payout item without its own recipient_type attribute uses the recipient_type value from sender_batch_header. If the sender_batch_header omits the recipient_type attribute, each payout item must include its own recipient_type value.",
+          "enum": [
+            "EMAIL",
+            "PHONE",
+            "PAYPAL_ID"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "SenderBatchHeader": {
+      "properties": {
+        "sender_batch_id": {
+          "type": "string",
+          "description": "A sender-specified ID number. Tracks the batch payout in an accounting system. Note: PayPal prevents duplicate batches from being processed. If you specify a sender_batch_id that was used in the last 30 days, the API rejects the request and returns an error message that indicates the duplicate sender_batch_id and includes a HATEOAS link to the original batch payout with the same sender_batch_id. If you receive an HTTP 5nn status code, you can safely retry the request with the same sender_batch_id. In any case, the API completes a payment only once for a specific sender_batch_id that is used within 30 days."
+        },
+        "recipient_type": {
+          "$ref": "#definitions/RecipientEnum"
+        },
+        "email_subject": {
+          "type": "string",
+          "description": "The subject line for the email that PayPal sends when payment for a payout item completes. The subject line is the same for all recipients. Value is an alphanumeric string with a maximum length of 255 single-byte characters."
+        }
+      },
+      "type": "object"
+    },
+    "TransactionEnum": {
+      "properties": {
+        "transaction_enum": {
+          "type": "string",
+          "description": "The item transaction status. Value is: NEW. The payment processing is delayed due to PayPal internal updates. SUCCESS. The payout item was successfully processed. DENIED. The payout item was denied payment. PENDING. The payout item is waiting to be processed. FAILED. Processing for the payout item failed. UNCLAIMED. The payout item is unclaimed. If it is not claimed within 30 days, the funds are returned to the sender. RETURNED. The payout item is returned. If the recipient does not claim it in 30 days, the funds are returned. ONHOLD. The payout item is on hold. BLOCKED. The payout item is blocked. REFUNDED. The payment for the payout item was successfully refunded.",
+          "enum": [
+            "NEW",
+            "SUCCESS",
+            "DENIED",
+            "PENDING",
+            "FAILED",
+            "UNCLAIMED",
+            "RETURNED",
+            "ONHOLD",
+            "BLOCKED",
+            "REFUNDED"
+          ]
+        }
+      },
+      "type": "object"
+    }
+  }
+}

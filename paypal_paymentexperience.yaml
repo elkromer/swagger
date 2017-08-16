@@ -1,0 +1,148 @@
+swagger: '2.0'
+schemes:
+  - https
+host: api.sandbox.paypal.com
+basePath: /v1/payment-experience
+info:
+  contact:
+    name: PayPal Payment Experience
+    url: 'https://paypal.com'
+  description: Manipulates PayPal Payment Experience API to create web profiles for purchases.
+  license:
+    name: Creative Commons Attribution 3.0
+    url: 'http://creativecommons.org/licenses/by/3.0/'
+  termsOfService: 'https://www.paypal.com/us/webapps/mpp/ua/xdeveloper-full'
+  title: PayPal PaymentExperienceAPI
+  version: v1
+externalDocs:
+  url: 'https://developer.paypal.com/docs/api/'
+securityDefinitions:
+  Oauth2c:
+    authorizationUrl: 'https://www.sandbox.paypal.com/signin/authorize'
+    description: Oauth 2.0 accessCode authentication    
+    flow: application
+    scopes:
+      'https://api.paypal.com/v1/payments': Payments
+    tokenUrl: 'https://api.sandbox.paypal.com/v1/oauth2/token'
+    type: oauth2
+tags:
+  - name: paymentExperience
+paths:
+  /web-profiles:
+    post:
+      description: >-
+        Creates a web experience profile. In the JSON request body, specify the profile name and details.
+      operationId: createWebProfile
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: webProfileObject
+          in: body
+          description: Web Profile to create
+          required: true
+          schema:
+            $ref: '#/definitions/WebProfile'
+      responses:
+        '201':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/CreateProfileResponse'
+      security:
+        - Oauth2c:
+            - 'https://api.paypal.com/v1/payments'
+      tags:
+        - paymentExperience
+definitions:
+  CreateProfileResponse:
+    properties:
+      id:
+        type: string
+        description: >-
+          The ID of the web experience profile.
+      name:
+        type: string
+        description: >-
+          The web experience profile name. Unique for a set of profiles for a merchant.
+      temporary: 
+        type: boolean
+        description: >-
+          Indicates whether the profile persists for three hours or permanently. Set to false to persist the profile permanently. Set to true to persist the profile for three hours.
+      presentation: 
+        $ref: '#/definitions/Presentation'
+      input_fields:
+        $ref: '#/definitions/InputFields'
+      flow_config:
+        $ref: '#/definitions/FlowConfig'
+    type: object
+  FlowConfig:
+    properties:
+      landing_page_type:
+        type: string
+        description: >-
+          The type of landing page to display on the PayPal site for user checkout. To use the non-PayPal account landing page, set to Billing. To use the PayPal account login landing page, set to Login.
+      bank_txn_pending_url:
+        type: string
+        description: >-
+          The merchant site URL to display after a bank transfer payment. In Germany, valid for only the Giropay payment method or bank transfer payment method.
+      user_action:
+        type: string
+        description: >-
+          Defines whether to present the buyer with a Continue or Pay Now checkout flow. To present buyers with the Pay Now checkout flow, set useraction=commit. Default is the Continue checkout flow.
+      return_uri_http_method:
+        type: string
+        description: >-
+          The HTTP method to use to redirect the buyer to a return URL. Value is GET or POST.
+    type: object
+  InputFields:
+    properties:
+      allow_note: 
+        type: boolean
+        description: Indicates whether the buyer can enter a note to the merchant on the PayPal page during checkout.
+      no_shipping:
+        type: integer
+        format: int64
+        description: >- 
+          Indicates whether PayPal displays shipping address fields on the experience pages. Value is 0,  Displays the shipping address on the PayPal pages. 1, Redacts shipping address fields from the PayPal pages. For digital goods, this field is required and must be 1. 2, Gets the shipping address from the buyer's account profile.
+      address_override:
+        type: integer
+        format: int64
+        description: >-
+          Indicates whether to display the shipping address that is passed to this call rather than the one on file for this buyer on the PayPal experience pages. 0, Displays the shipping address on file. 1, Displays the shipping address specified in this call. The buyer cannot edit this shipping address.
+    type: object
+  Presentation:
+    properties:
+      logo_image:
+        type: string
+        description: >-
+          A URL to the logo image. A valid media type is .gif, .jpg, or .png. The image's maximum width is 190 pixels and maximum height is 60 pixels. PayPal crops images that are larger. PayPal places your logo image at the top of the cart review area. PayPal recommends that you store the image on a secure (HTTPS) server. Otherwise, web browsers display a message that checkout pages contain non-secure items. Character length and limitations 127 single-byte alphanumeric characters.
+      brand_name:
+        type: string
+        description: >-
+          A label that overrides the business name in the PayPal account on the PayPal pages. Character length and limitations 127 single-byte alphanumeric characters.
+      locale_code: 
+        type: string
+        description: >-
+          The locale of pages that the PayPal payment experience displays. A valid value is AU, AT, BE, BR, CA, CH, CN, DE, ES, GB, FR, IT, NL, PL, PT, RU, or US. A 5-character code is also valid for languages in these countries - da_DK, he_IL, id_ID, ja_JP, no_NO, pt_BR, ru_RU, sv_SE, th_TH, zh_CN, zh_HK, or zh_TW.
+    type: object
+  WebProfile:
+    properties:
+      name:
+        type: string
+        description: >-
+          The web experience profile name. Unique for a set of profiles for a merchant.
+      temporary: 
+        type: boolean
+        description: >-
+          Indicates whether the profile persists for three hours or permanently. Set to false to persist the profile permanently. Set to true to persist the profile for three hours.
+      presentation: 
+        $ref: '#/definitions/Presentation'
+      input_fields:
+        $ref: '#/definitions/InputFields'
+      flow_config:
+        $ref: '#/definitions/FlowConfig'
+    type: object
+

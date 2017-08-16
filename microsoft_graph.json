@@ -1,0 +1,884 @@
+{
+  "swagger": "2.0",
+  "schemes": [
+    "https"
+  ],
+  "host": "graph.microsoft.com",
+  "basePath": "/v1.0",
+  "info": {
+    "contact": {
+      "name": "Microsoft Graph API",
+      "url": "https://graph.microsoft.com"
+    },
+    "description": "Access Microsoft Graph API",
+    "license": {
+      "name": "Creative Commons Attribution 3.0",
+      "url": "http://creativecommons.org/licenses/by/3.0/"
+    },
+    "termsOfService": "https://www.microsoft.com/en-us/legal/intellectualproperty/copyright/default.aspx",
+    "title": "Microsoft Graph API",
+    "version": "v1.0"
+  },
+  "externalDocs": {
+    "url": "https://developer.paypal.com/docs/api/"
+  },
+  "securityDefinitions": {
+    "Oauth2c": {
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+      "description": "Oauth 2.0 accessCode authentication",
+      "flow": "accessCode",
+      "scopes": {
+        "Mail.ReadWrite": "Mail"
+      },
+      "tokenUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+      "type": "oauth2"
+    }
+  },
+  "tags": [
+    {
+      "name": "graph"
+    }
+  ],
+  "paths": {
+    "/users": {
+      "get": {
+        "description": "Retrieve a list of user objects.",
+        "operationId": "listUsers",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/UserList"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "Mail.ReadWrite"
+            ]
+          }
+        ],
+        "tags": [
+          "graph"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "properties": {
+        "aboutMe": {
+          "type": "string",
+          "description": "A freeform text entry field for the user to describe themselves."
+        },
+        "city": {
+          "type": "string",
+          "description": "The city in which the user is located. Supports $filter."
+        },
+        "companyName": {
+          "type": "string",
+          "description": "The company name which the user is associated."
+        },
+        "country": {
+          "type": "string",
+          "description": "The country/region in which the user is located; for example, “US” or “UK”. Supports $filter."
+        },
+        "department": {
+          "type": "string",
+          "description": "The name for the department in which the user works. Supports $filter."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The name displayed in the address book for the user. This is usually the combination of the user's first name, middle initial and last name. This property is required when a user is created and it cannot be cleared during updates. Supports $filter and $orderby."
+        },
+        "givenName": {
+          "type": "string",
+          "description": "The given name (first name) of the user. Supports $filter."
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the user. Inherited from directoryObject. Key. Not nullable. Read-only."
+        },
+        "jobTitle": {
+          "type": "string",
+          "description": "The user’s job title. Supports $filter."
+        },
+        "mail": {
+          "type": "string",
+          "description": "The SMTP address for the user, for example, \"jeff@contoso.onmicrosoft.com\". Read-Only. Supports $filter."
+        },
+        "mailNickname": {
+          "type": "string",
+          "description": "The mail alias for the user. This property must be specified when a user is created. Supports $filter."
+        },
+        "mobilePhone": {
+          "type": "string",
+          "description": "The primary cellular telephone number for the user."
+        },
+        "mySite": {
+          "type": "string",
+          "description": "The URL for the user's personal site."
+        },
+        "officeLocation": {
+          "type": "string",
+          "description": "The office location in the user's place of business."
+        },
+        "onPremisesImmutableId": {
+          "type": "string",
+          "description": "This property is used to associate an on-premises Active Directory user account to their Azure AD user object. This property must be specified when creating a new user account in the Graph if you are using a federated domain for the user’s userPrincipalName (UPN) property. Important: The $ and **_** characters cannot be used when specifying this property. Supports $filter."
+        },
+        "onPremisesSecurityIdentifier": {
+          "type": "string",
+          "description": "Contains the on-premises security identifier (SID) for the user that was synchronized from on-premises to the cloud. Read-only."
+        },
+        "passwordPolicies": {
+          "type": "string",
+          "description": "Specifies password policies for the user. This value is an enumeration with one possible value being “DisableStrongPassword”, which allows weaker passwords than the default policy to be specified. “DisablePasswordExpiration” can also be specified. The two may be specified together; for example: \"DisablePasswordExpiration, DisableStrongPassword\"."
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "The postal code for the user's postal address. The postal code is specific to the user's country/region. In the United States of America, this attribute contains the ZIP code."
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "description": "The preferred language for the user. Should follow ISO 639-1 Code; for example \"en-US\"."
+        },
+        "preferredName": {
+          "type": "string",
+          "description": "The preferred name for the user."
+        },
+        "state": {
+          "type": "string",
+          "description": "The state or province in the user's address. Supports $filter."
+        },
+        "streetAddress": {
+          "type": "string",
+          "description": "The street address of the user's place of business."
+        },
+        "surname": {
+          "type": "string",
+          "description": "The user's surname (family name or last name). Supports $filter."
+        },
+        "usageLocation": {
+          "type": "string",
+          "description": "A two letter country code (ISO standard 3166). Required for users that will be assigned licenses due to legal requirement to check for availability of services in countries.  Examples include: \"US\", \"JP\", and \"GB\". Not nullable. Supports $filter."
+        },
+        "userPrincipalName": {
+          "type": "string",
+          "description": "The user principal name (UPN) of the user. The UPN is an Internet-style login name for the user based on the Internet standard RFC 822. By convention, this should map to the user's email name. The general format is alias@domain, where domain must be present in the tenant’s collection of verified domains. This property is required when a user is created. The verified domains for the tenant can be accessed from the verifiedDomains property of organization. Supports $filter and $orderby."
+        },
+        "userType": {
+          "type": "string",
+          "description": "A string value that can be used to classify user types in your directory, such as “Member” and “Guest”. Supports $filter."
+        },
+        "accountEnabled": {
+          "type": "boolean",
+          "description": "true if the account is enabled; otherwise, false. This property is required when a user is created. Supports $filter."
+        },
+        "onPremisesSyncEnabled": {
+          "type": "boolean",
+          "description": "true if this object is synced from an on-premises directory; false if this object was originally synced from an on-premises directory but is no longer synced; null if this object has never been synced from an on-premises directory (default). Read-only"
+        },
+        "businessPhones": {
+          "type": "array",
+          "description": "The telephone numbers for the user. NOTE: Although this is a string collection, only one number can be set for this property.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "imAddresses": {
+          "type": "array",
+          "description": "The instant message voice over IP (VOIP) session initiation protocol (SIP) addresses for the user. Read-only.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "interests": {
+          "type": "array",
+          "description": "A list for the user to describe their interests.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pastProjects": {
+          "type": "array",
+          "description": "A list for the user to enumerate their past projects.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "proxyAddresses": {
+          "type": "array",
+          "description": "For example: [\"SMTP: bob@contoso.com\", \"smtp: bob@sales.contoso.com\"] The any operator is required for filter expressions on multi-valued properties. Read-only, Not nullable. Supports $filter.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "responsibilities": {
+          "type": "array",
+          "description": "A list for the user to enumerate their responsibilities.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "schools": {
+          "type": "array",
+          "description": "A list for the user to enumerate the schools they have attended.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "skills": {
+          "type": "array",
+          "description": "A list for the user to enumerate their skills.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "birthday": {
+          "type": "string",
+          "description": "The birthday of the user. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 would look like this: '2014-01-01T00:00:00Z'"
+        },
+        "hireDate": {
+          "type": "string",
+          "description": "The hire date of the user. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 would look like this: '2014-01-01T00:00:00Z'"
+        },
+        "onPremisesLastSyncDateTime": {
+          "type": "string",
+          "description": "Indicates the last time at which the object was synced with the on-premises directory; for example: \"2013-02-16T03:04:54Z\". The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 would look like this: '2014-01-01T00:00:00Z'. Read-only."
+        },
+        "assignedLicenses": {
+          "type": "array",
+          "description": "",
+          "items": {
+            "$ref": "#/definitions/AssignedLicense"
+          }
+        },
+        "assignedPlans": {
+          "type": "array",
+          "description": "",
+          "items": {
+            "$ref": "#/definitions/AssignedPlan"
+          }
+        },
+        "mailboxSettings": {
+          "$ref": "#/definitions/MailboxSettings"
+        },
+        "provisionedPlans": {
+          "type": "array",
+          "description": "",
+          "items": {
+            "$ref": "#/definitions/ProvisionedPlan"
+          }
+        },
+        "passwordProfile": {
+          "$ref": "#/definitions/PasswordProfile"
+        },
+        "calendar": {
+          "$ref": "#/definitions/Calendar"
+        },
+        "drive": {
+          "$ref": "#/definitions/Drive"
+        },
+        "onenote": {
+          "$ref": "#/definitions/OneNote"
+        },
+        "photo": {
+          "$ref": "#/definitions/ProfilePhoto"
+        },
+        "inferenceClassification": {
+          "$ref": "#/definitions/InferenceClassification"
+        },
+        "manager": {
+          "$ref": "#/definitions/DirectoryObject"
+        },
+        "calendarGroups": {
+          "type": "array",
+          "description": "The user's calendar groups. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/CalendarGroup"
+          }
+        },
+        "calendarView": {
+          "type": "array",
+          "description": "The calendar view for the calendar. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/Event"
+          }
+        },
+        "calendars": {
+          "type": "array",
+          "description": "The user's calendars. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/Calendar"
+          }
+        },
+        "contactFolders": {
+          "type": "array",
+          "description": "The user's contacts folders. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/ContactFolder"
+          }
+        },
+        "contacts": {
+          "type": "array",
+          "description": "The user's contacts. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/Contact"
+          }
+        },
+        "createdObjects": {
+          "type": "array",
+          "description": "Directory objects that were created by the user. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/DirectoryObject"
+          }
+        },
+        "directReports": {
+          "type": "array",
+          "description": "The users and contacts that report to the user. (The users and contacts that have their manager property set to this user.) Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/DirectoryObject"
+          }
+        },
+        "drives": {
+          "type": "array",
+          "description": "A collection of drives available for this user. Read-only.",
+          "items": {
+            "$ref": "#/definitions/Drive"
+          }
+        },
+        "events": {
+          "type": "array",
+          "description": "The user's events. Default is to show Events under the Default Calendar. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/Event"
+          }
+        },
+        "extensions": {
+          "type": "array",
+          "description": "The collection of open extensions defined for the user. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/Extension"
+          }
+        },
+        "mailFolders": {
+          "type": "array",
+          "description": "The user's mail folders. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/MailFolder"
+          }
+        },
+        "memberOf": {
+          "type": "array",
+          "description": "The groups and directory roles that the user is a member of. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/DirectoryObject"
+          }
+        },
+        "messages": {
+          "type": "array",
+          "description": "The messages in a mailbox or folder. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/Message"
+          }
+        },
+        "ownedDevices": {
+          "type": "array",
+          "description": "Devices that are owned by the user. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/DirectoryObject"
+          }
+        },
+        "ownedObjects": {
+          "type": "array",
+          "description": "Directory objects that are owned by the user. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/DirectoryObject"
+          }
+        },
+        "registeredDevices": {
+          "type": "array",
+          "description": "Devices that are registered for the user. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/DirectoryObject"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "Message": {
+      "properties": {
+        "bodyPreview": {
+          "type": "string",
+          "description": "The first 255 characters of the message body. It is in text format."
+        },
+        "changeKey": {
+          "type": "string",
+          "description": "The version of the message."
+        },
+        "conversationId": {
+          "type": "string",
+          "description": "The ID of the conversation the email belongs to."
+        },
+        "createdDateTime": {
+          "type": "string",
+          "description": "The date and time the message was created."
+        },
+        "lastModifiedDateTime": {
+          "type": "string",
+          "description": "The date and time the message was last changed."
+        },
+        "receivedDateTime": {
+          "type": "string",
+          "description": "The date and time the message was received."
+        },
+        "sentDateTime": {
+          "type": "string",
+          "description": "The date and time the message was sent."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the message (note that this value may change if a message is moved or altered)"
+        },
+        "importance": {
+          "type": "string",
+          "description": "The importance of the message: Low, Normal, High."
+        },
+        "inferenceClassification": {
+          "type": "string",
+          "description": "The classification of the message for the user, based on inferred relevance or importance, or on an explicit override. Possible values are: focused or other."
+        },
+        "internetMessageId": {
+          "type": "string",
+          "description": "The message ID in the format specified by RFC2822."
+        },
+        "parentFolderId": {
+          "type": "string",
+          "description": "The unique identifier for the message's parent mailFolder."
+        },
+        "subject": {
+          "type": "string",
+          "description": "The subject of the message."
+        },
+        "webLink": {
+          "type": "string",
+          "description": "The URL to open the message in Outlook Web App. You can append an ispopout argument to the end of the URL to change how the message is displayed. If ispopout is not present or if it is set to 1, then the message is shown in a popout window. If ispopout is set to 0, then the browser will show the message in the Outlook Web App review pane. The message will open in the browser if you are logged in to your mailbox via Outlook Web App. You will be prompted to login if you are not already logged in with the browser. This URL can be accessed from within an iFrame."
+        },
+        "categories": {
+          "type": "array",
+          "description": "The categories associated with the message.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bccRecipients": {
+          "type": "array",
+          "description": "The Bcc: recipients for the message.",
+          "items": {
+            "$ref": "#/definitions/Recipient"
+          }
+        },
+        "ccRecipients": {
+          "type": "array",
+          "description": "The Cc: recipients for the message.",
+          "items": {
+            "$ref": "#/definitions/Recipient"
+          }
+        },
+        "replyTo": {
+          "type": "array",
+          "description": "The email addresses to use when replying.",
+          "items": {
+            "$ref": "#/definitions/Recipient"
+          }
+        },
+        "toRecipients": {
+          "type": "array",
+          "description": "The To: recipients for the message.",
+          "items": {
+            "$ref": "#/definitions/Recipient"
+          }
+        },
+        "body": {
+          "$ref": "#/definitions/ItemBody"
+        },
+        "from": {
+          "$ref": "#/definitions/Recipient"
+        },
+        "sender": {
+          "$ref": "#/definitions/Recipient"
+        },
+        "uniqueBody": {
+          "$ref": "#/definitions/ItemBody"
+        },
+        "hasAttachments": {
+          "type": "boolean",
+          "description": "Indicates whether the message has attachments. This property doesn't include inline attachments, so if a message contains only inline attachments, this property is false. To verify the existence of inline attachments, parse the body property to look for a src attribute, such as <IMG src=\"cid:image001.jpg@01D26CD8.6C05F070\">."
+        },
+        "isDeliveryReceiptRequested": {
+          "type": "boolean",
+          "description": "Indicates whether a read receipt is requested for the message."
+        },
+        "isDraft": {
+          "type": "boolean",
+          "description": "Indicates whether the message is a draft. A message is a draft if it hasn't been sent yet."
+        },
+        "isRead": {
+          "type": "boolean",
+          "description": "Indicates whether the message has been read."
+        },
+        "isReadReceiptRequested": {
+          "type": "boolean",
+          "description": "Indicates whether a read receipt is requested for the message."
+        }
+      },
+      "type": "object"
+    },
+    "Recipient": {
+      "properties": {
+        "emailAddress": {
+          "$ref": "#/definitions/EmailAddress"
+        }
+      },
+      "type": "object"
+    },
+    "EmailAddress": {
+      "properties": {
+        "address": {
+          "type": "string",
+          "description": "The email address of the person or entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The display name of the person or entity."
+        }
+      },
+      "type": "object"
+    },
+    "ItemBody": {
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "The content of the item."
+        },
+        "contentType": {
+          "type": "string",
+          "description": "The type of the content. Possible values are Text and HTML."
+        }
+      },
+      "type": "object"
+    },
+    "AssignedLicense": {
+      "properties": {
+        "disabledPlans": {
+          "type": "array",
+          "description": "Guid collection",
+          "items": {
+            "type": "string"
+          }
+        },
+        "skuld": {
+          "type": "string",
+          "description": "Guid"
+        }
+      },
+      "type": "object"
+    },
+    "AssignedPlan": {
+      "properties": {
+        "assignedDateTime": {
+          "type": "string",
+          "description": "The date and time at which the plan was assigned; for example: 2013-01-02T19:32:30Z. The Timestamp type represents date and time information using ISO 8601 format and is always in UTC time. For example, midnight UTC on Jan 1, 2014 would look like this: '2014-01-01T00:00:00Z'"
+        },
+        "capabilityStatus": {
+          "type": "string",
+          "description": "For example, “Enabled”."
+        },
+        "service": {
+          "type": "string",
+          "description": "The name of the service; for example, “Exchange”."
+        },
+        "servicePlanId": {
+          "type": "string",
+          "description": "A GUID that identifies the service plan."
+        }
+      },
+      "type": "object"
+    },
+    "MailboxSettings": {
+      "properties": {
+        "automaticRepliesSetting": {
+          "$ref": "#/definitions/AutomaticRepliesSetting"
+        },
+        "language": {
+          "$ref": "#/definitions/LocaleInfo"
+        },
+        "timeZone": {
+          "type": "string",
+          "description": "The default time zone for the user's mailbox."
+        }
+      },
+      "type": "object"
+    },
+    "AutomaticRepliesSetting": {
+      "properties": {
+        "externalAudience": {
+          "type": "string",
+          "description": "The set of audience external to the signed-in user's organization who will receive the ExternalReplyMessage, if Status is AlwaysEnabled or Scheduled. Possible values are: none, contactsOnly, all."
+        },
+        "externalReplyMessage": {
+          "type": "string",
+          "description": "The automatic reply to send to the specified external audience, if Status is AlwaysEnabled or Scheduled."
+        },
+        "internalReplyMessage": {
+          "type": "string",
+          "description": "The automatic reply to send to the audience internal to the signed-in user's organization, if Status is AlwaysEnabled or Scheduled."
+        },
+        "scheduledEndDateTime": {
+          "type": "string",
+          "description": "The date and time that automatic replies are set to end, if Status is set to Scheduled."
+        },
+        "scheduledStartDateTime": {
+          "type": "string",
+          "description": "The date and time that automatic replies are set to begin, if Status is set to Scheduled."
+        },
+        "status": {
+          "type": "string",
+          "description": "Configurations status for automatic replies. Possible values are: disabled, alwaysEnabled, scheduled."
+        }
+      },
+      "type": "object"
+    },
+    "LocaleInfo": {
+      "properties": {
+        "locale": {
+          "type": "string",
+          "description": "A locale representation for the user, which includes the user's preferred language and country/region. For example, \"en-us\". The language component follows 2-letter codes as defined in ISO 639-1, and the country component follows 2-letter codes as defined in ISO 3166-1 alpha-2."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "A name representing the user's locale in natural language, for example, \"English (United States)\"."
+        }
+      },
+      "type": "object"
+    },
+    "PasswordProfile": {
+      "properties": {
+        "forceChangePasswordNextSignIn": {
+          "type": "boolean",
+          "description": "true if the user must change her password on the next login; otherwise false."
+        },
+        "password": {
+          "type": "string",
+          "description": "The password for the user. This property is required when a user is created. It can be updated, but the user will be required to change the password on the next login. The password must satisfy minimum requirements as specified by the user’s passwordPolicies property. By default, a strong password is required."
+        }
+      },
+      "type": "object"
+    },
+    "ProvisionedPlan": {
+      "properties": {
+        "capabilityStatus": {
+          "type": "string",
+          "description": "For example, “Enabled”."
+        },
+        "provisioningStatus": {
+          "type": "string",
+          "description": "For example, “Success”."
+        },
+        "service": {
+          "type": "string",
+          "description": "The name of the service; for example, “AccessControlS2S”"
+        }
+      },
+      "type": "object"
+    },
+    "Calendar": {
+      "properties": {
+        "canEdit": {
+          "type": "boolean",
+          "description": "True if the user can write to the calendar, false otherwise. This property is true for the user who created the calendar. This property is also true for a user who has been shared a calendar and granted write access."
+        },
+        "canShare": {
+          "type": "boolean",
+          "description": "True if the user has the permission to share the calendar, false otherwise. Only the user who created the calendar can share it."
+        },
+        "canViewPrivateItems": {
+          "type": "boolean",
+          "description": "True if the user can read calendar items that have been marked private, false otherwise."
+        },
+        "changeKey": {
+          "type": "string",
+          "description": "Identifies the version of the calendar object. Every time the calendar is changed, changeKey changes as well. This allows Exchange to apply changes to the correct version of the object. Read-only."
+        },
+        "color": {
+          "type": "string",
+          "description": "Specifies the color theme to distinguish the calendar from other calendars in a UI. The property values are: LightBlue=0, LightGreen=1, LightOrange=2, LightGray=3, LightYellow=4, LightTeal=5, LightPink=6, LightBrown=7, LightRed=8, MaxColor=9, Auto=-1"
+        },
+        "id": {
+          "type": "string",
+          "description": "The group's unique identifier. Read-only."
+        },
+        "name": {
+          "type": "string",
+          "description": "The calendar name."
+        },
+        "owner": {
+          "$ref": "#/definitions/EmailAddress"
+        },
+        "calendarView": {
+          "type": "array",
+          "description": "The calendar view for the calendar. Navigation property. Read-only.",
+          "items": {
+            "$ref": "#/definitions/Event"
+          }
+        },
+        "events": {
+          "type": "array",
+          "description": "The events in the calendar. Navigation property. Read-only.",
+          "items": {
+            "$ref": "#/definitions/Event"
+          }
+        },
+        "multiValueExtendedProperties": {
+          "type": "array",
+          "description": "The collection of multi-value extended properties defined for the calendar. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/MultiValueLegacyExtendedProperty"
+          }
+        },
+        "singleValueExtendedProperties": {
+          "type": "array",
+          "description": "The collection of single-value extended properties defined for the calendar. Read-only. Nullable.",
+          "items": {
+            "$ref": "#/definitions/SingleValueLegacyExtendedProperty"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "OneNote": {
+      "properties": {
+        "unfinished": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ProfilePhoto": {
+      "properties": {
+        "unfinished": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "InferenceClassification": {
+      "properties": {
+        "unfinished": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "CalendarGroup": {
+      "properties": {
+        "unfinished": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ContactFolder": {
+      "properties": {
+        "unfinished": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Contact": {
+      "properties": {
+        "unfinished": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "DirectoryObject": {
+      "properties": {
+        "unfinished": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Drive": {
+      "properties": {
+        "unfinished": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Event": {
+      "properties": {
+        "unfinished": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Extension": {
+      "properties": {
+        "unfinished": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "MailFolder": {
+      "properties": {
+        "unfinished": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "SingleValueLegacyExtendedProperty": {
+      "properties": {
+        "unfinished": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "MultiValueLegacyExtendedProperty": {
+      "properties": {
+        "unfinished": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "UserList": {
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "An array of User objects.",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
+        }
+      },
+      "type": "object"
+    }
+  }
+}

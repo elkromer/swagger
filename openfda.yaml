@@ -1,0 +1,32 @@
+swagger: '2.0'
+schemes:
+  - https
+host: api.fda.gov
+basePath: /
+info:
+  contact:
+    name: OpenFDA
+    url: 'https://open.fda.gov'
+  description: OpenFDA is an Elasticsearch-based API that serves public FDA data about nouns like drugs, devices, and foods.
+  license:
+    name: Creative Commons CC0 1.0 Universal 
+    url: 'https://creativecommons.org/publicdomain/zero/1.0/'
+  termsOfService: 'https://open.fda.gov/terms/'
+  title: Food and Drug Administration OpenFDA API
+  version: v1
+externalDocs:
+  url: 'https://open.fda.gov/api/'
+securityDefinitions:
+  Oauth2c:
+    authorizationUrl: 'https://www.sandbox.paypal.com/signin/authorize'
+    description: Oauth 2.0 accessCode authentication
+    flow: accessCode
+    scopes:
+      'https://api.paypal.com/v1/payments': Payments
+    tokenUrl: 'https://api.sandbox.paypal.com/v1/oauth2/token'
+    type: oauth2
+tags:
+  - name: openfda
+paths:
+
+definitions:

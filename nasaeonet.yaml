@@ -1,0 +1,279 @@
+swagger: '2.0'
+schemes:
+  - https
+host: eonet.sci.gsfc.nasa.gov
+basePath: /api/v2.1
+info:
+  contact:
+    name: NASA
+    url: 'https://epic.gsfc.nasa.gov/'
+  description: Welcome to the NASA API portal. The objective of this site is to make NASA data, including imagery, eminently accessible to application developers. The api.nasa.gov catalog is growing.
+  license:
+    name: Creative Commons CC0 1.0 Universal 
+    url: 'https://creativecommons.org/publicdomain/zero/1.0/'
+  termsOfService: 'https://eonet.sci.gsfc.nasa.gov/eonet-project#disclaimer'
+  title: NASA EONET API
+  version: v2.1
+externalDocs:
+  url: 'https://eonet.sci.gsfc.nasa.gov/docs/v2.1'
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: api_key
+    in: query
+tags:
+  - name: eonet
+paths:
+  /events:
+    get:
+      description: Retrieve recent natural events in the EONET database.
+      operationId: getEvents
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: source
+          in: query
+          description: >-
+            Filter the returned events by the Source. Multiple sources can be included in the parameter: comma separated, operates as a boolean OR.
+          type: string
+        - name: status
+          in: query
+          description: >-
+            Events that have ended are assigned a closed date and the existence of that date will allow you to filter for only-open or only-closed events. Omitting the status parameter will return only the currently open events. Either "open" or "closed"
+          type: string
+        - name: limit
+          in: query
+          description: Limits the number of events returned
+          type: integer
+          format: int64
+        - name: days
+          in: query
+          description: Limit the number of prior days (including today) from which events will be returned.
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/EventList'
+      tags:
+        - eonet
+  /categories:
+    get:
+      description: Retrieve categories of recent natural events in the EONET database.
+      operationId: getCategories
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/CategoryList'
+      tags:
+        - eonet    
+  /categories/{categoryId}:
+    get:
+      description: Filter events by category
+      operationId: getEventsByCategory
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: categoryId
+          in: path
+          description: Id of the category to filter by.
+          type: integer
+          format: int64
+          required: true
+        - name: source
+          in: query
+          description: >-
+            Filter the returned events by the Source. Multiple sources can be included in the parameter: comma separated, operates as a boolean OR.
+          type: string
+        - name: status
+          in: query
+          description: >-
+            Events that have ended are assigned a closed date and the existence of that date will allow you to filter for only-open or only-closed events. Omitting the status parameter will return only the currently open events. Either "open" or "closed"
+          type: string
+        - name: limit
+          in: query
+          description: Limits the number of events returned
+          type: integer
+          format: int64
+        - name: days
+          in: query
+          description: Limit the number of prior days (including today) from which events will be returned.
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/EventList'
+      tags:
+        - eonet
+  /layers:
+    get:
+      description: List web service layers in the EONET system
+      operationId: getLayers
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/LayerList'
+      tags:
+        - eonet    
+  /layers/{categoryId}:
+    get:
+      description: Filter layers by category
+      operationId: getLayersByCategory
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: categoryId
+          in: path
+          description: Id of the category to filter by.
+          type: integer
+          format: int64
+          required: true
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/LayerList'
+      tags:
+        - eonet    
+definitions:
+  Param:
+    properties:
+      TILEMATRIXSET:
+        type: string
+      FORMAT:
+        type: string
+    type: object
+  Layer:
+    properties:
+      name:
+        type: string
+      serviceUrl:
+        type: string
+      serviceTypeId:
+        type: string
+      parameters:
+        type: array
+        items:
+          $ref: "#/definitions/Param"
+    type: object
+  LayerArray:
+    properties:
+      layers:
+        type: array
+        items:
+          $ref: "#/definitions/Layer"
+    type: object
+  LayerList:
+    properties:
+      title: 
+        type: string
+      description:
+        type: string
+      link:
+        type: string
+      categories:
+        type: array
+        items:
+          $ref: "#/definitions/LayerArray"
+    type: object
+  CategoryList:
+    properties:
+      title: 
+        type: string
+      description:
+        type: string
+      link:
+        type: string
+      categories:
+        type: array
+        items:
+          $ref: "#/definitions/Category"
+    type: object
+  Category: 
+    properties: 
+      id: 
+        type: integer
+        format: int64
+      title:
+        type: string
+      link:
+        type: string
+      description:
+        type: string
+      layers:
+        type: string
+    type: object
+  Source:   
+    properties: 
+      id:
+        type: string
+      url: 
+        type: string
+    type: object
+  Geometry: 
+    properties: 
+      date:
+        type: string
+      type: 
+        type: string
+      coordinates:
+        type: array
+        items:
+          type: number
+          format: float
+    type: object
+  EventList:
+    properties:
+      title:
+        type: string
+      description:
+        type: string
+      link:
+        type: string
+      events:
+        type: array
+        items:
+          $ref: "#/definitions/Event"     
+    type: object
+  Event:
+    properties:
+      id: 
+        type: string
+      title: 
+        type: string
+      description: 
+        type: string
+      link:
+        type: string
+      categories:
+        type: array
+        items:
+          $ref: "#/definitions/Category"
+      sources:
+        type: array
+        items:
+          $ref: "#/definitions/Source"
+      geometries:
+        type: array
+        items:
+          $ref: "#/definitions/Geometry"
+    type: object

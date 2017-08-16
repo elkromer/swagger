@@ -1,0 +1,479 @@
+swagger: '2.0'
+schemes:
+  - https
+host: api.nasa.gov
+basePath: /
+info:
+  contact:
+    name: NASA
+    url: 'https://api.nasa.gov/'
+  description: Welcome to the NASA API portal. The objective of this site is to make NASA data, including imagery, eminently accessible to application developers. The api.nasa.gov catalog is growing.
+  license:
+    name: Creative Commons CC0 1.0 Universal 
+    url: 'https://creativecommons.org/publicdomain/zero/1.0/'
+  termsOfService: 'https://www.nasa.gov/about/highlights/HP_Privacy.html'
+  title: NASA APIs
+  version: v1
+externalDocs:
+  url: 'https://open.fda.gov/api/'
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: api_key
+    in: query
+tags:
+  - name: apod
+paths:
+  #Astronomy picture of the day
+  /planetary/apod:
+    get:
+      description: Astronomy picture of the day
+      operationId: getAPOD
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: date
+          in: query
+          description: The date of the APOD image to retrieve ("today" or "YYYY-MM-DD")
+          type: string
+        - name: hd
+          in: query
+          description: Retrieve the URL for the high resolution image
+          type: boolean
+        - name: api_key
+          in: query
+          type: string
+          description: api.nasa.gov key for expanded usage ("DEMO-KEY" or api-key)
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/APOD'
+      tags:
+        - APOD
+  /mars-photos/api/v1/rovers/curiosity/photos:
+    get:
+      description: Astronomy picture of the day
+      operationId: getCuriosityPhotos
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: sol
+          in: query
+          description: sol (ranges from 0 to max found in endpoint)
+          type: integer
+          format: int64
+        - name: earth_date
+          in: query
+          description: The date of the image to retrieve ("YYYY-MM-DD")
+          type: string
+        - name: camera
+          in: query
+          description: >-
+            FHAZ, RHAZ, MAST, CHEMCAM, MAHLI, MARDI, NAVCAM, PANCAM, MINITES https://api.nasa.gov/api.html#MarsPhotos
+          type: string
+        - name: page
+          in: query
+          description: 25 items per page returned
+          type: integer
+          format: int64
+        - name: api_key
+          in: query
+          type: string
+          description: api.nasa.gov key for expanded usage ("DEMO-KEY" or api-key)
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/PhotoList'
+      tags:
+        - marsRover      
+  /planetary/sounds:
+    get:
+      description: Nasa space sounds api
+      operationId: getSounds
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: q
+          in: query
+          description: Search text to filter results
+          type: string
+        - name: limit
+          in: query
+          description: number of tracks to return
+          type: integer
+          format: int64
+        - name: api_key
+          in: query
+          type: string
+          description: api.nasa.gov key for expanded usage ("DEMO-KEY" or api-key)
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/SoundList'
+      tags:
+        - sounds    
+  /planetary/earth/imagery:
+    get:
+      description: Retrieves the Landsat 8 image for the supplied location and date.
+      operationId: getImage
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: lat
+          in: query
+          description: latitude
+          type: number
+          format: double
+        - name: lon
+          in: query
+          description: longitude
+          type: number
+          format: double
+        - name: dim
+          in: query
+          description: width and height of image in degrees
+          type: number
+          format: double
+        - name: date
+          in: query
+          description: date of image; if not supplied, then the most recent image is returned. format: ("YYYY-MM-DD")
+          type: string
+        - name: cloud_score
+          in: query
+          description: calculate the percentage of the image covered by clouds
+          type: boolean
+        - name: api_key
+          in: query
+          type: string
+          description: api.nasa.gov key for expanded usage ("DEMO-KEY")
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/EarthImage'
+      tags:
+        - earth  
+  /planetary/earth/assets:
+    get:
+      description: This endpoint retrieves the date-times and asset names for available imagery for a supplied location.
+      operationId: getAssets
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: lat
+          in: query
+          description: latitude
+          type: number
+          format: double
+        - name: lon
+          in: query
+          description: longitude
+          type: number
+          format: double
+        - name: begin
+          in: query
+          description: beginning of date range ("YYYY-MM-DD")
+          type: string
+        - name: end
+          in: query
+          description: end of date range ("YYYY-MM-DD")
+          type: string
+        - name: api_key
+          in: query
+          type: string
+          description: api.nasa.gov key for expanded usage ("DEMO-KEY")
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/AssetList'
+      tags:
+        - earth  
+  /patents:
+    get:
+      description: Nasa patent portfolio
+      operationId: getPatents
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: query
+          in: query
+          description: Search text to filter results
+          type: string
+        - name: concept_tags
+          in: query
+          description: Return an ordered dictionary of concepts from the patent abstract
+          type: boolean
+        - name: limit
+          in: query
+          description: number of patents to return
+          type: integer
+          format: int64
+        - name: api_key
+          in: query
+          type: string
+          description: api.nasa.gov key for expanded usage ("DEMO-KEY" or api-key)
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/PatentList'
+      tags:
+        - patents         
+definitions:
+  Patent:
+    properties:
+      category:
+        type: string
+      client_record_id:
+        type: string
+      center:
+        type: string
+      reference_number:
+        type: string
+      expiration_date:
+        type: string
+      abstract:
+        type: string
+      title:
+        type: string
+      innovator:
+        type: array
+        items:
+          $ref: "#/definitions/Innovator"
+      contact:
+        $ref: "#/definitions/Contact"
+      publication:
+        type: array
+        items:
+          $ref: "#/definitions/Publication"
+      concepts:
+        $ref: "#/definitions/Concepts"
+      serial_number:
+        type: string
+      _id:
+        type: string
+      id:
+        type: string
+      patent_number:
+        type: string
+      trl:
+        type: string
+    type: object
+  PatentList:
+    properties:
+      count: 
+        type: integer
+        format: int64
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/Patent"
+    type: object
+  Asset:
+    properties:
+      date:
+        type: string
+      id: 
+        type: string
+    type: object
+  AssetList:
+    properties:
+      count:
+        type: integer
+        format: int64
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/Asset"
+    type: object
+  EarthImage:
+    properties:
+      date: 
+        type: string
+      url: 
+        type: string
+      cloud_score:
+        type: number
+        format: double
+      id:
+        type: string
+    type: object
+  Sound:
+    properties:
+      description:
+        type: string
+      license:
+        type: string
+      title:
+        type: string
+      download_url:   
+        type: string
+      last_modified:  
+        type: string
+      stream_url:     
+        type: string
+      tag_list:       
+        type: string
+      duration:
+        type: integer
+        format: int64
+      id:
+        type: integer
+        format: int64
+    type: object
+  SoundList:
+    properties:
+      count:
+        type: integer
+        format: int64
+      results:
+        type: array
+        items:
+          $ref: "#/definitions/Sound"
+    type: object
+  Concepts:
+    properties:
+      '0':
+        type: string
+      '1':
+        type: string
+      '2': 
+        type: string
+      '3': 
+        type: string
+      '4': 
+        type: string
+      '5': 
+        type: string
+      '6': 
+        type: string
+      '7': 
+        type: string
+      '8': 
+        type: string
+      '9': 
+        type: string 
+    type: object
+  Publication:
+    properties:
+      type: 
+        type: string
+      title:
+        type: string
+    type: object
+  Contact:
+    properties:
+      email:
+        type: string
+      office:
+        type: string
+      facility:
+        type: string
+    type: object
+  Innovator:
+    properties:
+      lname:
+        type: string
+      mname:
+        type: string
+      company:
+        type: string
+      order:
+        type: string
+      fname:
+        type: string
+    type: object
+  Camera:
+    properties:
+      name: 
+        type: string
+      full_name:
+        type: string
+    type: object
+  Rover:
+    properties:
+      id:
+        type: integer
+        format: int64
+      name: 
+        type: string
+      landing_date:
+        type: string
+      launch_date:
+        type: string
+      status:
+        type: string
+      max_sol:
+        type: integer
+        format: int64
+      max_date: 
+        type: string
+      total_photos:
+        type: integer
+        format: int64
+      cameras:
+        type: array
+        items:
+          $ref: "#/definitions/Camera"
+    type: object
+  Photo:
+    properties:
+      id: 
+        type: integer
+        format: int64
+      sol:
+        type: integer
+        format: int64
+      camera:
+        $ref: "#/definitions/Camera"
+      img_src:
+        type: string
+        description: url of the image
+      earth_date: 
+        type: string
+      rover:
+        $ref: "#/definitions/Rover"
+    type: object
+  PhotoList:
+    properties:
+      photos:
+        type: array
+        items:
+          $ref: "#/definitions/Photo"
+    type: object
+  APOD:
+    properties:
+      copywright:
+        type: string
+      date: 
+        type: string
+      explanation:
+        type: string
+      hdurl:
+        type: string
+        description: The HD url for the requested image.
+      media_type:
+        type: string
+      service_version:
+        type: string
+      title:
+        type: string
+      url: 
+        type: string
+    type: object

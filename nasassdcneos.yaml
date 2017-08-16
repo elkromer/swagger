@@ -1,0 +1,192 @@
+swagger: '2.0'
+schemes:
+  - https
+host: ssd-api.jpl.nasa.gov
+basePath: /
+info:
+  contact:
+    name: NASA
+    url: 'https://ssd-api.jpl.nasa.gov/'
+  description: Welcome to the NASA API portal. The objective of this site is to make NASA data, including imagery, eminently accessible to application developers. The api.nasa.gov catalog is growing.
+  license:
+    name: Creative Commons CC0 1.0 Universal 
+    url: 'https://creativecommons.org/publicdomain/zero/1.0/'
+  termsOfService: 'https://www.jpl.nasa.gov/copyrights.php'
+  title: NASA SSD/CNEOS API
+  version: v2.1
+externalDocs:
+  url: 'https://ssd-api.jpl.nasa.gov/doc/cad.html'
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: api_key
+    in: query
+tags:
+  - name: ssdcneos
+paths:
+  /cad.api:
+    get:
+      description: Get close approach data for query
+      operationId: getCAD
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: "date-min"
+          in: query
+          description: >-
+            exclude data earlier than this date YYYY-MM-DD or date/time YYYY-MM-DDThh:mm:ss or now for the current date
+          type: string
+        - name: "date-max"
+          in: query
+          description: >-
+            exclude data later than this date YYYY-MM-DD or date/time YYYY-MM-DDThh:mm:ss or now for the current date or +D for “D” days after now. +60 default.
+          type: string
+        - name: "dist_min"
+          in: query
+          description: >-
+            exclude data with an approach distance less than this, e.g., 0.05, 10LD (default units: au)
+          type: string  
+        - name: "dist-max"
+          in: query
+          description: >-
+            exclude data with an approach distance greater than this (see dist-min)
+          type: string         
+        - name: "h-min"
+          in: query
+          description: >-
+            exclude data from objects with H-values less than this (e.g., 22 meaning objects smaller than this)
+          type: number
+          format: double
+        - name: "h-max"
+          in: query
+          description: >-
+            exclude data from objects with H-value greater than this (e.g., 17.75 meaning objects larger than this)
+          type: number
+          format: double
+        - name: "v-inf-min"
+          in: query
+          description: >-
+            exclude data with V-infinity less than this positive value in km/s (e.g., 18.5)
+          type: number
+          format: double       
+        - name: "v-inf-max"
+          in: query
+          description: >-
+            exclude data with V-infinity greater than this positive value in km/s (e.g., 20)
+          type: number
+          format: double   
+        - name: "v-rel-min"
+          in: query
+          description: >-
+            exclude data with V-relative less than this positive value in km/s (e.g., 11.2)
+          type: number
+          format: double          
+        - name: "v-rel-max"
+          in: query
+          description: >-
+            exclude data with V-relative greater than this positive value in km/s (e.g., 19)
+          type: number
+          format: double   
+        - name: class
+          in: query
+          description: >-
+            limit data to objects with the specified orbit-class (e.g., ATE; see list of valid class values)
+          type: string
+        - name: pha
+          in: query
+          description: >-
+            limit data to PHAs
+          type: boolean
+        - name: nea
+          in: query
+          description: >-
+            limit data to NEAs
+          type: boolean
+        - name: comet
+          in: query
+          description: >-
+            limit data to comets
+          type: boolean      
+        - name: "nea-comet"
+          in: query
+          description: >-
+            limit data to NEAs and comets
+          type: boolean   
+        - name: neo
+          in: query
+          description: >-
+            limit data to NEOs
+          type: boolean             
+        - name: kind
+          in: query
+          description: >-
+            limit data to objects of the specified kind (a=asteriod, an=numbered-asteroids, au=unnumbered-asteroids, c=comets, cn=numbered-comets, cu=unnumbered-comets, n=numbered-objects, and u=unnumbered-objects)
+          type: string 
+        - name: spk
+          in: query
+          description: >-
+            only data for the object matching this SPK-ID (e.g., 2000433 )
+          type: integer
+          format: int64
+        - name: des
+          in: query
+          description: >-
+            only data for the object matching this designation (e.g., 2015 AB or 141P or 433) [NOTE: when submitting a des containing a space in your query string, you must replace the space with %20, for example 2015%20AB]
+          type: string
+        - name: body
+          in: query
+          description: >-
+            limit data to close-approaches to the specified body (e.g., Earth) or allow all bodies with ALL or * (see Close Approach Bodies section below) 
+          type: string        
+        - name: sort
+          in: query
+          description: >-
+            sort data on the specified field: “date”, “dist”, “dist-min”, “v-inf”, “v-rel”, “h”, or “object” (default sort order is ascending: prepend “-“ for descending) 
+          type: string
+        - name: limit
+          in: query
+          description: >-
+            limit data to the first N results (where N is the specified number and must be an integer value greater than zero)
+          type: integer
+          format: int64
+        - name: fullname
+          in: query
+          description: >-
+            include the full-format object name/designation
+          type: boolean
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/CADList'
+      tags:
+        - ssdcneos            
+definitions:
+  CAD:
+    items:
+      type: string
+    type: array
+  Signature:
+    properties:
+      source:
+        type: string
+      version: 
+        type: string
+    type: object
+  CADList:
+    properties:
+      signature: 
+        $ref: "#/definitions/Signature"
+      count: 
+        type: string
+      fields:
+        type: array
+        items:
+          type: string
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/CAD"
+    type: object

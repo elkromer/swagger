@@ -1,0 +1,1109 @@
+swagger: '2.0'
+schemes:
+  - https
+host: api.sandbox.paypal.com
+basePath: /v1/invoicing
+info:
+  contact:
+    name: PayPal InvoicesAPI
+    url: 'https://developer.paypal.com/docs/api/invoicing/#invoices'
+  description: >-
+    Use the Invoicing API to create, send, and manage invoices. You can also use the Invoicing API or webhooks to track invoice payments.
+  license:
+    name: Creative Commons Attribution 3.0
+    url: 'http://creativecommons.org/licenses/by/3.0/'
+  termsOfService: 'https://www.paypal.com/us/webapps/mpp/ua/xdeveloper-full'
+  title: PayPal InvoicesAPI
+  version: v1
+externalDocs:
+  url: 'https://developer.paypal.com/docs/api/'
+securityDefinitions:
+  Oauth2c:
+    authorizationUrl: 'https://www.sandbox.paypal.com/signin/authorize'
+    description: Oauth 2.0 accessCode authentication
+    flow: application
+    scopes:
+      'https://uri.paypal.com/services/invoicing': Invoices
+      'openid': Login
+    tokenUrl: 'https://api.sandbox.paypal.com/v1/oauth2/token'
+    type: oauth2
+tags:
+  - name: payments
+paths:
+  /search:
+    post:
+      description: >-
+        Lists invoices that match search criteria. If you pass multiple criteria, the response lists invoices that 
+        match all criteria. A successful request returns the HTTP 200 OK status code and a JSON response body that 
+        lists the invoices that match the search criteria.
+      operationId: searchInvoices
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: search
+          in: body
+          description: Object containing desired search criteria.
+          required: true
+          schema:
+            $ref: '#/definitions/Search'
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/InvoiceList'
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/invoicing'
+      tags:
+        - invoices     
+  /invoices:
+    post:
+      description: >-
+        Creates a draft invoice. To move the invoice from a draft to payable state, you must send the invoice. 
+        In the JSON request body, include invoice details including merchant information. The invoice object must 
+        include an items array.
+      operationId: createDraftInvoice
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: invoiceObject
+          in: body
+          description: Object containing invoice information
+          required: true
+          schema:
+            $ref: '#/definitions/Invoice'
+      responses:
+        '201':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/InvoiceDetails'
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/invoicing'
+      tags:
+        - invoices
+    get:
+      description: >-
+        Lists merchant invoices. To filter the invoices that appear in the response, you can specify one or more 
+        optional query parameters. A successful request returns the HTTP 200 OK status code and a JSON response body 
+        that lists invoices with details.
+      operationId: listInvoices
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: page
+          in: query
+          description: >-
+            The zero-relative start index of the entire list of merchant invoices that are returned in the response. 
+            So, the combination of page=0 and page_size=20 returns the first 20 invoices.The combination of page=20 and 
+            page_size=20 returns the next 20 invoices.
+          type: integer
+          format: int64
+        - name: page_size
+          in: query
+          description: The number of invoices to return in the response.
+          type: integer
+          format: int64
+        - name: total_count_required
+          in: query
+          description: Indicates whether the to show the total count in the response.
+          type: boolean
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/InvoiceList'
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/invoicing'
+      tags:
+        - invoices   
+  /invoices/{invoice_id}:
+    get:
+      description: >-
+        Shows details for an invoice, by ID. A successful request returns the HTTP 200 OK status code and a JSON 
+        response body that shows invoice details.
+      operationId: detailInvoice
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: invoice_id
+          in: path
+          description: ID of the invoice.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/InvoiceDetails'
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/invoicing'
+      tags:
+        - invoices 
+    put:
+      description: >-
+        Fully updates an invoice, by ID. In the JSON request body, include a complete invoice object. This call does 
+        not support partial updates. A successful request returns the HTTP 200 OK status code and a JSON response 
+        body that shows invoice details.
+      operationId: updateInvoice
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: invoice_id
+          in: path
+          description: ID of the invoice.
+          required: true
+          type: string
+        - name: invoiceObject
+          in: body
+          description: Object containing invoice information
+          required: true
+          schema:
+            $ref: '#/definitions/Invoice'
+        - name: notify_merchant
+          in: query
+          description: Indicates whether to send the invoice update notification to the merchant.
+          type: boolean
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/InvoiceDetails'
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/invoicing'
+      tags:
+        - invoices 
+    delete:
+      description: >-
+        Deletes draft invoices. You can cancel invoices that you have already sent. After you delete a draft invoice, 
+        you can no longer use it or show its details. However, you can reuse its invoice number. A successful request 
+        returns the HTTP 204 No Content status code with no JSON response body.
+      operationId: deleteDraftInvoice
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: invoice_id
+          in: path
+          description: ID of the invoice.
+          required: true
+          type: string
+      responses:
+        '204':
+          description: Client request successful
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/invoicing'
+      tags:
+        - invoices           
+  /invoices/{invoice_id}/send:
+    post:
+      description: >-
+        Sends an invoice, by ID, to a customer. To suppress the merchant's email notification, set the notify_merchant 
+        query parameter to false. A successful request returns the HTTP 202 Accepted status code with no JSON response 
+        body.
+      operationId: sendInvoice
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: invoice_id
+          in: path
+          description: ID of the invoice.
+          required: true
+          type: string
+        - name: notify_merchant
+          in: query
+          description: Indicates whether to send the invoice update notification to the merchant.
+          type: boolean
+      responses:
+        '202':
+          description: Client request successful
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/invoicing'
+      tags:
+        - invoices     
+  /invoices/{invoice_id}/remind:
+    post:
+      description: >-
+        Sends a reminder to the payer about an invoice, by ID. In the JSON request body, include a notification object 
+        that defines the subject of the reminder and other details.  A successful request returns the HTTP 202 Accepted 
+        status code with no JSON response body.
+      operationId: sendInvoiceReminder
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: invoice_id
+          in: path
+          description: ID of the invoice.
+          required: true
+          type: string
+        - name: notification
+          in: body
+          description: Object containing notification information
+          required: true
+          schema:
+            $ref: '#/definitions/Notification'
+      responses:
+        '202':
+          description: Client request successful
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/invoicing'
+      tags:
+        - invoices 
+  /invoices/{invoice_id}/cancel:
+    post:
+      description: >-
+        Cancels a sent invoice, by ID, and, optionally, sends a notification about the cancellation to the payer, 
+        merchant, and CC: emails. A successful request returns the HTTP 204 No Content status code with no JSON response 
+        body.
+      operationId: cancelInvoice
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: invoice_id
+          in: path
+          description: ID of the invoice.
+          required: true
+          type: string
+        - name: cancel_notification
+          in: body
+          description: Object containing cancel_notification information
+          required: true
+          schema:
+            $ref: '#/definitions/CancelNotification'
+      responses:
+        '204':
+          description: Client request successful
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/invoicing'
+      tags:
+        - invoices     
+  /invoices/{invoice_id}/record-payment:
+    post:
+      description: >-
+        Marks the status of an invoice, by ID, as paid. A successful request returns the HTTP 200 OK status code 
+        with no JSON response body.
+      operationId: markAsPaid
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: invoice_id
+          in: path
+          description: ID of the invoice.
+          required: true
+          type: string
+        - name: payment_detail
+          in: body
+          description: Object containing payment information
+          required: true
+          schema:
+            $ref: '#/definitions/PaymentDetail'
+      responses:
+        '200':
+          description: Client request successful
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/invoicing'
+      tags:
+        - invoices     
+  /invoices/{invoice_id}/record-refund:
+    post:
+      description: >-
+        Marks the status of an invoice, by ID, as refunded. A successful request returns the HTTP 200 OK status code 
+        with no JSON response body.
+      operationId: markAsRefunded
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: invoice_id
+          in: path
+          description: ID of the invoice.
+          required: true
+          type: string
+        - name: refund_detail
+          in: body
+          description: Object containing refund information
+          required: true
+          schema:
+            $ref: '#/definitions/RefundDetail'
+      responses:
+        '200':
+          description: Client request successful
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/invoicing'
+      tags:
+        - invoices         
+
+
+  /invoices/{invoice_id}/qr-code:
+    get:
+      description: >-
+        Generates a QR code for an invoice, by ID. The QR code is a PNG image in Base64-encoded format that corresponds 
+        to the invoice ID. You can generate a QR code for an invoice and add it to a paper or PDF invoice. When 
+        customers use their mobile devices to scan the QR code, they are redirected to the PayPal mobile payment flow 
+        where they can view the invoice and pay online with PayPal or a credit card. Before you generate a QR code, you must
+        (1) Create an invoice. (2) Send an invoice to move it to the 'payable' state.
+      operationId: generateQR
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: invoice_id
+          in: path
+          description: ID of the invoice.
+          required: true
+          type: string
+        - name: width
+          in: query
+          description: The width, in pixels, of the QR code image. Value is from 150 to 500.
+          type: integer
+          format: int64
+        - name: height
+          in: query
+          description: The height, in pixels, of the QR code image. Value is from 150 to 500.
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/QR'
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/invoicing'
+      tags:
+        - invoices   
+  /invoices/next-invoice-number:
+    post:
+      description: >-
+        Generates the next invoice number that is available to the merchant. The next invoice number uses the prefix 
+        and suffix from the last invoice number and increments the number by one. For example, the next invoice number 
+        after INVOICE-1234 is INVOICE-1235. A successful request returns the HTTP 200 OK status code and a JSON response 
+        body that shows the next invoice number.
+      operationId: nextInvoiceNumber
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/InvoiceNumber'
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/invoicing'
+      tags:
+        - invoices      
+definitions:
+  InvoiceNumber:
+    properties:
+      number:
+        type: string
+        description: >-
+          The invoice number. If you omitted this value from the request, the default is the auto-incremented number from the last number.
+    type: object
+  QR:
+    properties:
+      image:
+        type: string
+        description: QR code as a PNG image in base-64-encoded format
+    type: object
+  Search:
+    properties:
+      email:
+        type: string
+        description: The initial letters of the email address.
+      recipient_first_name:
+        type: string
+        description: The initial letters of the recipient's first name.
+      recipient_last_name: 
+        type: string
+        description: The initial letters of the recipient's last name.
+      recipient_business_name:
+        type: string
+        description: The initial letters of the recipient's business name.
+      number: 
+        type: string
+        description: Any part of the invoice number.
+      status:
+        type: string
+        description: >-
+          The invoice status. To search by status, specify this value as an array. For example, "status": ["REFUNDED"].
+      lower_total_amount:
+        type: string
+        description: The lower limit of the total amount.
+      upper_total_amount:
+        type: string
+        description: The upper limit of total amount.
+      start_invoice_date:
+        type: string
+        description: The start date for the invoice, in Internet date and time format. For example, yyyy-MM-dd z.
+      end_invoice_date:
+        type: string
+        description: The end date for the invoice, in Internet date and time format. For example, yyyy-MM-dd z.
+      start_due_date:
+        type: string
+        description: The start due date for the invoice, in Internet date and time format. For example, yyyy-MM-dd z.
+      end_due_date:
+        type: string
+        description: The end due date for the invoice, in Internet date and time format. For example, yyyy-MM-dd z.
+      start_payment_date:
+        type: string
+        description: The start payment date for the invoice, in Internet date and time format. For example, yyyy-MM-dd z.
+      end_payment_date:
+        type: string
+        description: The end payment date for the invoice, in Internet date and time format. For example, yyyy-MM-dd z.
+      start_creation_date:
+        type: string
+        description: The start creation date for the invoice, in Internet date and time format. For example, yyyy-MM-dd z.
+      end_creation_date:
+        type: string
+        description: The end creation date for the invoice, in Internet date and time format. For example, yyyy-MM-dd z.
+      page: 
+        type: integer
+        format: int64
+        description: >-
+          The zero-relative start index of the entire list of merchant invoices to return in the response. So, a 
+          combination of page=0 and page_size=20 returns the first 20 invoices. A combination of page=20 and 
+          page_size=20 returns the next 20 invoices.
+      page_size:
+        type: integer
+        format: int64
+        description: The page size for the search results.
+      total_count_required:
+        type: boolean
+        description: Indicates whether the response shows the total count.
+      archived:
+        type: boolean
+        description: >- 
+          Indicates whether to list merchant-archived invoices in the response. If true, response lists only 
+          merchant-archived invoices. If false, response lists only unarchived invoices. If null, response lists all 
+          invoices.
+    type: object
+  InvoiceList:
+    properties:
+      total_count:
+        type: integer
+        format: int64
+        description: The total number of invoices that match the search criteria.
+      invoices:
+        type: array
+        description: The invoice details.
+        items: 
+          $ref: '#/definitions/Invoice'
+      links:
+        type: array
+        description: HATEOAS links related to this call.
+        items:
+          $ref: '#/definitions/Link'
+    type: object
+  CancelNotification:
+    properties:
+      subject:
+        type: string
+        description: The subject of the notification. If left blank we include a generic subject.
+      note:
+        type: string
+        description: A note to the payer
+      send_to_merchant:
+        type: boolean
+        description: Indicates whether to send the notification to the merchant.
+      send_to_payer:
+        type: boolean
+        description: Indicates whether to send the notification to the payer.
+      cc_emails:
+        type: array
+        description: >-
+          An array of one or more CC: emails. If you omit this parameter from the JSON request body, a notification 
+          is sent to all CC: email addresses that are part of the invoice. Otherwise, specify this parameter to limit 
+          the email addresses to which a notification is sent.
+        items:
+          type: string
+    type: object
+  Notification:
+    properties:
+      subject:
+        type: string
+        description: The subject of the notification. Default is a generic subject.
+      note:
+        type: string
+        description: A note to the payer.
+      send_to_merchant:
+        type: boolean
+        description: Indicates whether to send a copy of the email to the merchant.
+      cc_emails:
+        type: array
+        description: >-
+          An array of one or more CC: emails to which notifications are sent. If you omit this parameter, a notification 
+          is sent to all CC: email addresses that are part of the invoice.
+        items:
+          type: string
+    type: object
+  Link:
+    properties:
+      href:
+        type: string
+        description: The URL of the related HATEOAS link that you can use for subsequent calls.
+      rel: 
+        type: string
+        description: >-
+          The link relationship. Describes how this link relates to the previous call. For example, use a self link to 
+          show details for the current call. Use a parent_payment link to show details for the parent payment. The rel 
+          value can also be a related call, such as execute or refund.
+      method:
+        type: string
+        description: The HTTP method required to make the related call.
+    type: object
+  FileAttachment:
+    properties:
+      name:
+        type: string
+        description: The name of the attached file. 
+      url: 
+        type: string
+        description: The URL of the attached file. Use this URL to download the file.
+    type: object
+  Metadata:
+    properties:
+      created_date:
+        type: string
+        description: >-
+          The date and time when the resource was created, in Internet date and time format.
+      created_by:
+        type: string
+        description: The email address of the account that created the resource.
+      cancelled_date:
+        type: string
+        description: >-
+          The date and time when the resource was canceled, in Internet date and time format.
+      cancelled_by:
+        type: string
+        description: The actor who canceled the resource.
+      last_updated_date:
+        type: string
+        description: >-
+          The date and time when the resource was last edited, in Internet date and time format.
+      first_sent_date:
+        type: string
+        description: >-
+          The date and time when the resource was first sent, in Internet date and time format.
+      last_sent_date:
+        type: string
+        description: >-
+          The date and time when the resource was last sent, in Internet date and time format.
+      last_sent_by:
+        type: string
+        description: The email address of the account that last sent the resource.
+      payer_view_url:
+        type: string
+        description: The URL for the payer's view of the invoice.
+    type: object
+  PaymentSummary:
+    properties:
+      paypal: 
+        $ref: '#/definitions/Amount'
+      other:
+        $ref: '#/definitions/Amount'
+    type: object
+  RefundDetail:
+    properties:
+      type: 
+        type: string
+        description: >-
+          The PayPal refund type. Indicates whether the refund was paid through PayPal or externally in the invoicing 
+          flow. The record refund method supports the EXTERNAL refund type. The PAYPAL refund type is supported for 
+          backward compatibility.
+      transaction_id:
+        type: string
+        description: >-
+          The ID of the PayPal refund transaction. Required for the PAYPAL refund type
+      date:
+        type: string
+        description: >-
+          The date when the invoice was refunded, in Internet date and time format. For example, 2014-02-27 PST.
+      note: 
+        type: string
+        description: A note associated with the refund.
+      amount:
+        $ref: '#/definitions/Amount'
+    type: object
+  PaymentDetail:
+    properties:
+      type: 
+        type: string
+        description: >-
+          The payment type in an invoicing flow. The record refund method supports the EXTERNAL refund type. The PAYPAL 
+          refund type is supported for backward compatibility.
+      transaction_id:
+        type: string
+        description: >-
+          The ID for a PayPal payment transaction. Required for the PAYPAL payment type.
+      transaction_type:
+        type: string
+        description: The transaction type.
+      date:
+        type: string
+        description: >-
+          The date when the invoice was paid, in Internet date and time format. For example, yyyy-MM-dd z.
+      method:
+        type: string
+        description: The payment mode or method.
+      note: 
+        type: string
+        description: Note associated with the payment
+      amount:
+        $ref: '#/definitions/Amount'
+    type: object
+  InvoiceDetails:
+    properties:
+      id:
+        type: string
+        description: ID of the invoice.
+      number:
+        type: string
+        description: >-
+          The invoice number. If you omit this value, the default is the auto-incremented number from the last number.
+      uri:
+        type: string
+        description: URI of the invoice.
+      status:
+        type: string
+        description: >-
+          The invoice status. When you search for invoices, specify this value as an array. For example, "status": ["REFUNDED"].
+      merchant_info:
+        $ref: '#/definitions/MerchantInfo'
+      billing_info:
+        type: array
+        description: The billing information for the invoice recipient.
+        items:
+          $ref: '#/definitions/BillingInfo'
+      shipping_info:
+        $ref: '#/definitions/ShippingInfo'
+      cc_info:
+        type: array
+        description: The participant information.
+        items:
+          $ref: '#/definitions/Participant'
+      items:
+        type: array
+        description: The invoice line item information.
+        items:
+          $ref: '#/definitions/InvoiceItem'
+      invoice_date:
+        type: string
+        description: >-
+          The invoice date as specificed by the sender, in Internet date and time format. For example, yyyy-MM-dd z.
+      payment_term:
+        $ref: '#/definitions/PaymentTerm'
+      reference:
+        type: string
+        description: The reference data, such as PO number.
+      discount:
+        $ref: '#/definitions/Discount'
+      shipping_cost:
+        $ref: '#/definitions/ShippingCost'
+      custom:
+        $ref: '#/definitions/Custom'
+      allow_partial_payment:
+        type: boolean
+        description: >-
+          Indicates whether the invoice allows a partial payment. If false, invoice must be paid in full. If true, 
+          the invoice allows partial payments.
+      minimum_amount_due:
+        $ref: '#/definitions/Amount'
+      tax_calculated_after_discount:
+        type: boolean
+        description: >- 
+          Indicates whether the tax is calculated before or after a discount. If false, the tax is calculated before 
+          a discount. If true, the tax is calculated after a discount.
+      terms:
+        type: string
+        description: The general terms of the invoice.
+      note:
+        type: string
+        description: A note to the invoice recipient. The note also appears on the invoice notification email.
+      merchant_memo:
+        type: string
+        description: A private bookkeeping memo for the merchant.
+      logo_url:
+        type: string
+        description: >-
+          The full URL to an external logo image. The logo must not be larger than 250 pixels wide by 90 pixels high. 
+          The logo must be stored on a secure server.
+      total_amount:
+        $ref: '#/definitions/Amount'
+      payments:
+        type: array
+        description: The payment details.
+        items:
+          $ref: '#/definitions/PaymentDetail'
+      refunds:
+        type: array
+        description: The invoicing refund details.
+        items:
+          $ref: '#/definitions/RefundDetail'
+      metadata:
+        $ref: '#/definitions/Metadata'
+      paid_amount:
+        $ref: '#/definitions/PaymentSummary'
+      refunded_amount:
+        $ref: '#/definitions/PaymentSummary'
+      attachments:
+        type: array
+        description: The file that is attached to an invoice or template.
+        items:
+          $ref: '#/definitions/FileAttachment'
+      allow_tip:
+        type: boolean
+        description: >-
+          Indicates whether the invoice enables the customer to enter a tip amount during payment. If true, the invoice 
+          shows a tip amount field so that the customer can enter a tip amount. If false, the invoice does not show a 
+          tip amount field.
+      template_id:
+        type: string
+        description: >-
+          The template ID. This value is used to determine the layout of the invoice, such as which fields to show and hide.
+      links:
+        type: array
+        description: HATEOAS links related to this call.
+        items:
+          $ref: '#/definitions/Link'
+    type: object
+  Custom:
+    properties:
+      label: 
+        type: string
+        description: The custom amount label.
+      amount:
+        $ref: '#/definitions/Amount'
+    type: object
+  ShippingCost:
+    properties:
+      amount: 
+        $ref: '#/definitions/Amount'
+      tax:
+        $ref: '#/definitions/Tax'
+    type: object
+  PaymentTerm:
+    properties:
+      term_type:
+        type: string
+        description: The term when the invoice payment is due.
+      due_date:
+        type: string
+        description: The date when the invoice payment is due, in Internet date and time format. For example, yyyy-MM-dd z.
+    type: object
+  Discount:
+    properties:
+      percent:
+        type: number
+        format: float
+        description: >-
+          The discount as a percentage value. Value is from 0 to 100. Supports up to five decimal places.
+      amount:
+        $ref: '#/definitions/Amount'
+    type: object
+  Tax:
+    properties:
+      name:
+        type: string
+        description: The tax name.
+      percent:
+        type: number
+        format: float
+        description: >-
+          The tax rate. Value is from 0 to 100. Supports up to five decimal places.
+      amount:
+        $ref: '#/definitions/Amount'
+    type: object
+  Amount:
+    properties:
+      currency:
+        type: string
+        description: The three-letter ISO 4217 alphabetic currency code.
+      value:
+        type: string
+        description: >-
+          The currency value. Might be an integer for currencies like JPY that are not typically fractional or a decimal 
+          fraction for currencies like TND that are subdivided into thousandths. For the required number of decimal 
+          places for a currency code, see ISO 4217.
+    type: object
+  InvoiceItem:
+    properties:
+      name: 
+        type: string
+        description: Item name
+      description: 
+        type: string
+        description: Item description
+      quantity:
+        type: number
+        format: float
+        description: >-
+          The item quantity. Value is from -10000 to 10000. Supports up to five decimal places.
+      unit_price:
+        $ref: '#/definitions/Amount'
+      tax:
+        $ref: '#/definitions/Tax'
+      date:
+        type: string
+        description: >-
+          The date when the item or service was provided, in Internet date and time format. For example, yyyy-MM-dd z.
+      discount:
+        $ref: '#/definitions/Discount'
+      unit_of_measure:
+        type: string
+        description: >-
+          The unit of measure for the invoiced item. For AMOUNT the unit_price and quantity are not shown on the invoice.
+    type: object
+  Participant:
+    properties:
+      email: 
+        type: string
+        description: The email address of the person who receives a copy of the invoice.
+    type: object
+  ShippingInfo:
+    properties:
+      first_name:
+        type: string
+        description: The first name of the recipient at the shipping address.
+      last_name:
+        type: string
+        description: The last name of the recipient at the shipping address.
+      business_name:
+        type: string
+        description: The business name of the recipient at the shipping address.
+      address:
+        $ref: '#/definitions/Address'
+    type: object
+  BillingInfo:
+    properties:
+      email:
+        type: string
+        description: >-
+          The invoice recipient email address. If you omit this value, the invoice is payable and a 
+          notification email is not sent.
+      phone:
+        $ref: '#/definitions/PhoneFaxNumber'
+      first_name:
+        type: string
+        description: The invoice recipient's first name.
+      last_name:
+        type: string
+        description: The invoice recipient's last name.
+      business_name:
+        type: string
+        description: The invoice recipient's business name.
+      address:
+        $ref: '#/definitions/Address'
+      language:
+        type: string
+        description: >-
+          The language in which the invoice recipient's email appears. Used only when the recipient does not have a 
+          PayPal account. If you omit the language and the recipient does not have a PayPal account, the email is sent 
+          in the language of the merchant's PayPal account.
+      additional_info:
+        type: string
+        description: Any additional information about the recipient.
+    type: object
+  PhoneFaxNumber:
+    properties:
+      country_code:
+        type: string
+        description: The country code portion of the phone number, in E.164 format.
+      national_number:
+        type: string
+        description: The in-country phone number, in E.164 format.
+    type: object
+  Address:
+    properties:
+      line1: 
+        type: string
+      line2:
+        type: string
+      city:
+        type: string
+      country_code:
+        type: string
+        description: >-
+          The two-character ISO 3166-1 code that identifies the country or region.
+      postal_code:
+        type: string
+      state:
+        type: string
+      phone:
+        type: string
+        description: >-
+          A phone number. Must be represented in its canonical international format, as defined by the E.164 numbering plan.
+    type: object
+  MerchantInfo:
+    properties:
+      email:
+        type: string
+        description: >-
+          The merchant email address. This email must be listed in the merchant's PayPal profile. If you omit this 
+          value, notifications are sent from and to the primary email address but do not appear on the invoice.  
+      business_name:
+        type: string
+        description: The merchant's business name.
+      first_name:
+        type: string
+        description: The merchant's first name.
+      last_name: 
+        type: string
+        description: The merchant's last name.
+      address:
+        $ref: '#/definitions/Address'
+      phone:
+        $ref: '#/definitions/PhoneFaxNumber'
+      fax:
+        $ref: '#/definitions/PhoneFaxNumber'
+      website:
+        type: string
+        description: The merchant's website.
+      tax_id:
+        type: string
+        description: The merchant's tax ID.
+      additional_info:
+        type: string
+        description: Any additional information, such as business hours.
+    type: object
+  Invoice:
+    properties:
+      id:
+        type: string
+        description: The ID of the invoice.
+      number:
+        type: string
+        description: >-
+          The invoice number. If you omit this value, the default is the auto-incremented number from the last number.
+      merchant_info:
+        $ref: '#/definitions/MerchantInfo'
+      billing_info:
+        type: array
+        description: The billing information for the invoice recipient.
+        items:
+          $ref: '#/definitions/BillingInfo'
+      shipping_info:
+        $ref: '#/definitions/ShippingInfo'
+      cc_info:
+        type: array
+        description: The participant information.
+        items:
+          $ref: '#/definitions/Participant'
+      items:
+        type: array
+        description: The invoice line item information.
+        items:
+          $ref: '#/definitions/InvoiceItem'
+      invoice_date:
+        type: string
+        description: >-
+          The invoice date as specificed by the sender, in Internet date and time format. For example, yyyy-MM-dd z.
+      payment_term:
+        $ref: '#/definitions/PaymentTerm'
+      reference:
+        type: string
+        description: The reference data, such as PO number.
+      discount:
+        $ref: '#/definitions/Discount'
+      shipping_cost:
+        $ref: '#/definitions/ShippingCost'
+      custom:
+        $ref: '#/definitions/Custom'
+      allow_partial_payment:
+        type: boolean
+        description: >-
+          Indicates whether the invoice allows a partial payment. If false, invoice must be paid in full. If true, 
+          the invoice allows partial payments.
+      minimum_amount_due:
+        $ref: '#/definitions/Amount'
+      tax_calculated_after_discount:
+        type: boolean
+        description: >-
+          Indicates whether the tax is calculated before or after a discount. If false, the tax is calculated before 
+          a discount. If true, the tax is calculated after a discount.
+      tax_inclusive:
+        type: boolean
+        description: Indicates whether the unit price includes tax.
+      terms:
+        type: string
+        description: The general terms of the invoice.
+      note: 
+        type: string
+        description: A note to the invoice recipient. The note also appears on the invoice notification email.
+      merchant_memo:
+        type: string
+        description: A private bookkeeping memo for the merchant.
+      logo_url:
+        type: string
+        description: >-
+          The full URL to an external logo image. The logo must not be larger than 250 pixels wide by 90 pixels high. 
+          The logo must be stored on a secure server.
+      allow_tip:
+        type: boolean
+        description: >-
+          Indicates whether the invoice enables the customer to enter a tip amount during payment. If true, the 
+          invoice shows a tip amount field so that the customer can enter a tip amount. If false, the invoice does 
+          not show a tip amount field.
+      template_id:
+        type: string
+        description: >-
+          The template ID. This value is used to determine the layout of the invoice, such as which fields to show and hide.
+    type: object

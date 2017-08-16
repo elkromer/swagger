@@ -1,0 +1,433 @@
+{
+  "swagger": "2.0",
+  "schemes": [
+    "https"
+  ],
+  "host": "epic.gsfc.nasa.gov",
+  "basePath": "/",
+  "info": {
+    "contact": {
+      "name": "NASA",
+      "url": "https://epic.gsfc.nasa.gov/"
+    },
+    "description": "Welcome to the NASA API portal. The objective of this site is to make NASA data, including imagery, eminently accessible to application developers. The api.nasa.gov catalog is growing.",
+    "license": {
+      "name": "Creative Commons CC0 1.0 Universal",
+      "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "termsOfService": "https://www.nasa.gov/about/highlights/HP_Privacy.html",
+    "title": "NASA EPIC API",
+    "version": "v1"
+  },
+  "externalDocs": {
+    "url": "https://epic.gsfc.nasa.gov/about/api"
+  },
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "name": "api_key",
+      "in": "query"
+    }
+  },
+  "tags": [
+    {
+      "name": "epic"
+    }
+  ],
+  "paths": {
+    "/api/natural": {
+      "get": {
+        "description": "Retrieve metadata on the most recent date of natural color imagery.",
+        "operationId": "getNaturalMetadata",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ImageMeta"
+              }
+            }
+          }
+        },
+        "tags": [
+          "epic"
+        ]
+      }
+    },
+    "/api/natural/date/{dateString}": {
+      "get": {
+        "description": "Retrieve metadata for natural color imagery available for a given date.",
+        "operationId": "getNaturalMetadataByDate",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "dateString",
+            "in": "path",
+            "description": "Date to filter by (\"YYYY-MM-DD\")",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ImageMeta"
+              }
+            }
+          }
+        },
+        "tags": [
+          "epic"
+        ]
+      }
+    },
+    "/api/natural/all": {
+      "get": {
+        "description": "Retrieve a listing of all dates with available natural color imagery.",
+        "operationId": "getAllNaturalDates",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Date"
+              }
+            }
+          }
+        },
+        "tags": [
+          "epic"
+        ]
+      }
+    },
+    "/api/enhanced": {
+      "get": {
+        "description": "Retrieve metadata on the most recent date of enhanced color imagery.",
+        "operationId": "getEnhancedMetadata",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ImageMeta"
+              }
+            }
+          }
+        },
+        "tags": [
+          "epic"
+        ]
+      }
+    },
+    "/api/enhanced/date/{dateString}": {
+      "get": {
+        "description": "Retrieve metadata for enhanced color imagery for a given date.",
+        "operationId": "getEnhancedMetadataByDate",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "dateString",
+            "in": "path",
+            "description": "Date to filter by (\"YYYY-MM-DD\")",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ImageMeta"
+              }
+            }
+          }
+        },
+        "tags": [
+          "epic"
+        ]
+      }
+    },
+    "/api/enhanced/all": {
+      "get": {
+        "description": "Retrieve a listing of all dates with available enhanced color imagery.",
+        "operationId": "getAllEnhancedDates",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Date"
+              }
+            }
+          }
+        },
+        "tags": [
+          "epic"
+        ]
+      }
+    },
+    "/archive/natural/{year}/{month}/{day}/{imageType}/{imageName}": {
+      "get": {
+        "description": "Retrieve image.",
+        "operationId": "getNaturalImage",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "image/jpeg",
+          "image/png"
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "description": "Year of photo \"YYYY\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "description": "Month of photo \"MM\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "day",
+            "in": "path",
+            "description": "Day of photo \"DD\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "imageType",
+            "in": "path",
+            "description": "Resultion image to return (\"png\" = full resolution, \"jpg\" = half resolution, \"thumbs\" = thumbnails)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "imageName",
+            "in": "path",
+            "description": "Name of photo with corresponding suffix.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "type": "string",
+              "format": "byte"
+            }
+          }
+        },
+        "tags": [
+          "epic"
+        ]
+      }
+    },
+    "/archive/enhanced/{year}/{month}/{day}/{imageType}/{imageName}": {
+      "get": {
+        "description": "Retrieve color enhanced image.",
+        "operationId": "getEnhancedImage",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json",
+          "image/jpeg",
+          "image/png"
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "description": "Year of photo \"YYYY\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "description": "Month of photo \"MM\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "day",
+            "in": "path",
+            "description": "Day of photo \"DD\"",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "imageType",
+            "in": "path",
+            "description": "Resultion image to return (\"png\" = full resolution, \"jpg\" = half resolution, \"thumbs\" = thumbnails)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "imageName",
+            "in": "path",
+            "description": "Name of photo with corresponding suffix.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "type": "string",
+              "format": "byte"
+            }
+          }
+        },
+        "tags": [
+          "epic"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "Date": {
+      "properties": {
+        "date": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "GeoCoord": {
+      "properties": {
+        "lat": {
+          "type": "number",
+          "format": "float"
+        },
+        "lon": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "type": "object"
+    },
+    "GraphCoord": {
+      "properties": {
+        "x": {
+          "type": "number",
+          "format": "float"
+        },
+        "y": {
+          "type": "number",
+          "format": "float"
+        },
+        "z": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "type": "object"
+    },
+    "QuaternionValues": {
+      "properties": {
+        "q0": {
+          "type": "number",
+          "format": "float"
+        },
+        "q1": {
+          "type": "number",
+          "format": "float"
+        },
+        "q2": {
+          "type": "number",
+          "format": "float"
+        },
+        "q3": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "type": "object"
+    },
+    "ImageMeta": {
+      "properties": {
+        "image": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "caption": {
+          "type": "string"
+        },
+        "centroid_coordinates": {
+          "$ref": "#/definitions/GeoCoord"
+        },
+        "dscovr_j2000_position": {
+          "$ref": "#/definitions/GraphCoord"
+        },
+        "lunar_j2000_position": {
+          "$ref": "#/definitions/GraphCoord"
+        },
+        "sun_j2000_position": {
+          "$ref": "#/definitions/GraphCoord"
+        },
+        "attitude_quaternions": {
+          "$ref": "#/definitions/QuaternionValues"
+        },
+        "coords": {
+          "type": "string",
+          "description": "String that contains all coordinate information."
+        }
+      },
+      "type": "object"
+    }
+  }
+}
