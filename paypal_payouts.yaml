@@ -6,7 +6,7 @@ basePath: /v1/payments
 info:
   contact:
     name: PayPal Payouts API
-    url: 'https://developer.paypal.com/docs/api/payments.payouts-batch#payouts'
+    url: 'https://developer.paypal.com/docs/api/payments.payouts-batch'
   description: >-
     Use the Payouts API to make PayPal payments to multiple PayPal accounts in a
     single API call. You can specify the recipients by using their PayPal email
@@ -30,12 +30,10 @@ securityDefinitions:
     tokenUrl: 'https://api.sandbox.paypal.com/v1/oauth2/token'
     type: oauth2
   Oauth2c:
-    authorizationUrl: 'https://www.sandbox.paypal.com/signin/authorize'
     description: Oauth 2.0 accessCode authentication
-    flow: accessCode
+    flow: application
     scopes:
       'https://uri.paypal.com/services/payments/payouts': Payouts
-      openid: Login
     tokenUrl: 'https://api.sandbox.paypal.com/v1/oauth2/token'
     type: oauth2
 tags:
@@ -84,7 +82,7 @@ paths:
         - Oauth2c:
             - 'https://uri.paypal.com/services/payments/payouts'
       tags:
-        - vault
+        - payouts
   '/payouts/{payout_batch_id}':
     get:
       description: >-
@@ -107,6 +105,7 @@ paths:
             The ID of the batch payout for which to show status. You can use the
             payout_batch_id value that the create batch payout request created.
           type: string
+          required: true
         - name: fields
           in: query
           description: Optional. Shows details for only the specified fields.
@@ -115,12 +114,81 @@ paths:
         '200':
           description: Client request successful
           schema:
-            $ref: '#/definitions/PayoutsBatchResponse'
+            $ref: '#/definitions/PayoutsBatchDetailsResponse'
       security:
         - Oauth2c:
             - 'https://uri.paypal.com/services/payments/payouts'
       tags:
-        - vault
+        - payouts
+  '/payouts-item/{payout_item_id}':
+    get:
+      description: >-
+        Shows the details for a payout item. Use this call to review the current
+        status of a previously unclaimed, or pending, payout item. For the
+        supported status values, see the transaction status table in show batch
+        payout details. A successful request returns the HTTP 200 OK status code
+        and a JSON response body that shows payout details.
+      operationId: showPayoutItemDetails
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: payout_item_id
+          in: path
+          description: >-
+            Specify a payout item ID. The show batch payout details call shows
+            payout item IDs in payout_item_id fields.
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#definitions/PayoutItemDetails'
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/payments/payouts'
+      tags:
+        - payouts
+  '/payouts-item/{payout_item_id}/cancel':
+    post:
+      description: >-
+        Cancels an unclaimed transaction. If no one claims the unclaimed item
+        within 30 days, the funds are automatically returned to the sender. Use
+        this call to cancel the unclaimed item before the automatic 30-day
+        refund. A successful request returns the HTTP 200 OK status code and a
+        JSON response body with the payout_item_details object that shows
+        canceled payout details including a RETURNED transaction status.
+      operationId: cancelUnclaimedPayoutItem
+      consumes:
+        - application/json
+        - application/xml
+      produces:
+        - application/json
+        - application/xml
+      parameters:
+        - name: payout_item_id
+          in: path
+          description: >-
+            Specify a payout item ID followed by the /cancel action in the URI.
+            The show batch payout details call shows payout item IDs in
+            payout_item_id fields. You can cancel only payout items with a
+            transaction_status of UNCLAIMED.
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#definitions/PayoutItemDetails'
+      security:
+        - Oauth2c:
+            - 'https://uri.paypal.com/services/payments/payouts'
+      tags:
+        - payouts
 definitions:
   BatchEnum:
     properties:
@@ -147,7 +215,7 @@ definitions:
         items:
           $ref: '#/definitions/PayoutItemDetails'
     type: object
-  Currency:
+  CurrencyObject:
     properties:
       currency:
         description: 3 letter currency code
@@ -203,7 +271,7 @@ definitions:
           A JSON pointer. References a location in the target document where the
           operation is performed.
       value:
-        type: object
+        type: string
         description: The value to apply. The remove operation does not require a value.
       from:
         type: string
@@ -260,18 +328,32 @@ definitions:
       sender_batch_header:
         $ref: '#definitions/SenderBatchHeader'
       amount:
-        $ref: '#definitions/Currency'
+        $ref: '#definitions/CurrencyObject'
       fees:
-        $ref: '#definitions/Currency'
+        $ref: '#definitions/CurrencyObject'
       errors:
         $ref: '#definitions/Error'
     type: object
   PayoutItem:
     properties:
       recipient_type:
-        $ref: '#/definitions/RecipientEnum'
+        type: string
+        description: >-
+          The type of ID that identifies the payment receiver. Value is: EMAIL-
+          Unencrypted email. Value is a string of up to 127 single-byte
+          characters. PHONE- Unencrypted phone number. Note: The PayPal sandbox
+          does not support the PHONE recipient type. PAYPAL_ID- Encrypted PayPal
+          account number. If the sender_batch_header includes the recipient_type
+          attribute, any payout item without its own recipient_type attribute
+          uses the recipient_type value from sender_batch_header. If the
+          sender_batch_header omits the recipient_type attribute, each payout
+          item must include its own recipient_type value.
+        enum:
+          - EMAIL
+          - PHONE
+          - PAYPAL_ID
       amount:
-        $ref: '#definitions/Currency'
+        $ref: '#definitions/CurrencyObject'
       note:
         type: string
         description: >-
@@ -301,7 +383,7 @@ definitions:
       transaction_status:
         $ref: '#definitions/TransactionEnum'
       payout_item_fee:
-        $ref: '#definitions/Currency'
+        $ref: '#definitions/CurrencyObject'
       payout_batch_id:
         type: string
         description: The PayPal-generated ID for the batch payout.
@@ -345,24 +427,15 @@ definitions:
         items:
           $ref: '#definitions/PayoutItem'
     type: object
-  RecipientEnum:
+  PayoutsBatchDetailsResponse:
     properties:
-      recipient_enum:
-        type: string
-        description: >-
-          The type of ID that identifies the payment receiver. Value is: EMAIL-
-          Unencrypted email. Value is a string of up to 127 single-byte
-          characters. PHONE- Unencrypted phone number. Note: The PayPal sandbox
-          does not support the PHONE recipient type. PAYPAL_ID- Encrypted PayPal
-          account number. If the sender_batch_header includes the recipient_type
-          attribute, any payout item without its own recipient_type attribute
-          uses the recipient_type value from sender_batch_header. If the
-          sender_batch_header omits the recipient_type attribute, each payout
-          item must include its own recipient_type value.
-        enum:
-          - EMAIL
-          - PHONE
-          - PAYPAL_ID
+      batch_header:
+        $ref: '#definitions/PayoutBatchHeader'
+      items:
+        type: array
+        description: A sender-created payout to a single recipient.
+        items:
+          $ref: '#definitions/PayoutItemDetails'
     type: object
   SenderBatchHeader:
     properties:
@@ -379,7 +452,21 @@ definitions:
           the same sender_batch_id. In any case, the API completes a payment
           only once for a specific sender_batch_id that is used within 30 days.
       recipient_type:
-        $ref: '#definitions/RecipientEnum'
+        type: string
+        description: >-
+          The type of ID that identifies the payment receiver. Value is: EMAIL-
+          Unencrypted email. Value is a string of up to 127 single-byte
+          characters. PHONE- Unencrypted phone number. Note: The PayPal sandbox
+          does not support the PHONE recipient type. PAYPAL_ID- Encrypted PayPal
+          account number. If the sender_batch_header includes the recipient_type
+          attribute, any payout item without its own recipient_type attribute
+          uses the recipient_type value from sender_batch_header. If the
+          sender_batch_header omits the recipient_type attribute, each payout
+          item must include its own recipient_type value.
+        enum:
+          - EMAIL
+          - PHONE
+          - PAYPAL_ID
       email_subject:
         type: string
         description: >-

@@ -1,0 +1,229 @@
+swagger: '2.0'
+schemes:
+  - https
+host: images-api.nasa.gov
+basePath: /
+info:
+  contact:
+    name: NASA
+    url: 'https://images.nasa.gov/'
+  description: Welcome to the NASA API portal. The objective of this site is to make NASA data, including imagery, eminently accessible to application developers. The api.nasa.gov catalog is growing.
+  license:
+    name: Creative Commons CC0 1.0 Universal 
+    url: 'https://creativecommons.org/publicdomain/zero/1.0/'
+  termsOfService: 'https://www.nasa.gov/about/highlights/HP_Privacy.html'
+  title: NASA Image and Video API
+  version: v1
+externalDocs:
+  url: 'https://images.nasa.gov/docs/images.nasa.gov_api_docs.pdf'
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: api_key
+    in: query
+tags:
+  - name: imageVideo
+paths:
+  /search: 
+    get:
+      description: Free text search terms to compare to all indexed metadata
+      operationId: search
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: q
+          in: query
+          description: The date of the APOD image to retrieve ("today" or "YYYY-MM-DD")
+          type: string
+        - name: center
+          in: query
+          description: NASA center which published the media
+          type: string
+        - name: description
+          in: query
+          description: Terms to search for in “Description” fields.
+          type: string   
+        - name: description_508
+          in: query
+          description: Terms to search for in “508 Description” fields.
+          type: string  
+        - name: keywords
+          in: query
+          description: Terms to search for in “Keywords” fields. Separate multiple values with commas
+          type: string  
+        - name: location
+          in: query
+          description: Terms to search for in “Location” fields.
+          type: string  
+        - name: media_type
+          in: query
+          description: >-
+            Media types to restrict the search to. Available types: [“image”, “audio”]. Separate multiple values with commas
+          type: string  
+        - name: nasa_id
+          in: query
+          description: The media asset’s NASA ID
+          type: string  
+        - name: photographer
+          in: query
+          description: The primary photographer’s name.
+          type: string  
+        - name: secondary_creator
+          in: query
+          description: A secondary photographer/videographer’s name
+          type: string  
+        - name: title
+          in: query
+          description: Terms to search for in “Title” fields.
+          type: string     
+        - name: year_start
+          in: query
+          description: The start year for results. Format: YYYY.
+          type: string  
+        - name: year_end
+          in: query
+          description: The end year for results. Format: YYYY
+          type: string            
+        - name: api_key
+          in: query
+          type: string
+          description: api.nasa.gov key for expanded usage ("DEMO-KEY" or api-key)
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/MediaList'
+      tags:
+        - imageVideo 
+  /asset/{nasaId}:
+    get:
+      description: Retrieve a media asset's manifest
+      operationId: getManifest
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: nasaId
+          in: path
+          description: The media asset’s NASA ID.
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/MediaList'
+      tags:
+        - imageVideo     
+  /metadata/{nasaId}:
+    get:
+      description: Retrieve a media asset's metadata location
+      operationId: getMetadata
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: nasaId
+          in: path
+          description: The media asset’s NASA ID.
+          type: string
+          required: true          
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/Metadata'
+      tags:
+        - imageVideo    
+  /captions/{nasaId}:
+    get:
+      description: Retrieve a media asset's captions location
+      operationId: getCaptions
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: nasaId
+          in: path
+          description: The media asset’s NASA ID.
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/Metadata'
+      tags:
+        - imageVideo      
+definitions:
+  MediaDetails:
+    properties:
+      media_type:  
+        type: string
+      nasa_id:      
+        type: string
+      description: 
+        type: string
+      title:       
+        type: string
+      center:      
+        type: string
+      date_created:
+        type: string
+      keywords:
+        type: array
+        items:
+          type: string
+    type: object
+  Links:      
+    properties: 
+      rel:    
+        type: string
+      prompt: 
+        type: string
+      href:   
+        type: string
+    type: object
+  Metadata:   
+    properties: 
+      location:
+        type: string
+      total_hits:
+        type: integer
+        format: int64
+    type: object
+  MediaItem:  
+    properties: 
+      href:
+        type: string
+      data:
+        type: array
+        items:
+          $ref: "#/definitions/MediaDetails"
+    type: object
+  Collection: 
+    properties:
+      links:
+        $ref: "#/definitions/Links"
+      metadata:
+        $ref: "#/definitions/Metadata"
+      href:
+        type: string
+      version:
+        type: string
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/MediaItem"
+    type: object
+  MediaList:
+    properties:
+      collection:
+        $ref: "#/definitions/Collection"
+    type: object
+    

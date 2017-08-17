@@ -35,12 +35,10 @@
       "type": "oauth2"
     },
     "Oauth2c": {
-      "authorizationUrl": "https://www.sandbox.paypal.com/signin/authorize",
       "description": "Oauth 2.0 accessCode authentication",
-      "flow": "accessCode",
+      "flow": "application",
       "scopes": {
-        "https://uri.paypal.com/services/payments/payouts": "Payouts",
-        "openid": "Login"
+        "https://uri.paypal.com/services/payments/payouts": "Payouts"
       },
       "tokenUrl": "https://api.sandbox.paypal.com/v1/oauth2/token",
       "type": "oauth2"
@@ -118,7 +116,8 @@
             "name": "payout_batch_id",
             "in": "path",
             "description": "The ID of the batch payout for which to show status. You can use the payout_batch_id value that the create batch payout request created.",
-            "type": "string"
+            "type": "string",
+            "required": true
           },
           {
             "name": "fields",
@@ -131,7 +130,89 @@
           "200": {
             "description": "Client request successful",
             "schema": {
-              "$ref": "#/definitions/PayoutsBatchResponse"
+              "$ref": "#/definitions/PayoutsBatchDetailsResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://uri.paypal.com/services/payments/payouts"
+            ]
+          }
+        ],
+        "tags": [
+          "payouts"
+        ]
+      }
+    },
+    "/payouts-item/{payout_item_id}": {
+      "get": {
+        "description": "Shows the details for a payout item. Use this call to review the current status of a previously unclaimed, or pending, payout item. For the supported status values, see the transaction status table in show batch payout details. A successful request returns the HTTP 200 OK status code and a JSON response body that shows payout details.",
+        "operationId": "showPayoutItemDetails",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "payout_item_id",
+            "in": "path",
+            "description": "Specify a payout item ID. The show batch payout details call shows payout item IDs in payout_item_id fields.",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#definitions/PayoutItemDetails"
+            }
+          }
+        },
+        "security": [
+          {
+            "Oauth2c": [
+              "https://uri.paypal.com/services/payments/payouts"
+            ]
+          }
+        ],
+        "tags": [
+          "payouts"
+        ]
+      }
+    },
+    "/payouts-item/{payout_item_id}/cancel": {
+      "post": {
+        "description": "Cancels an unclaimed transaction. If no one claims the unclaimed item within 30 days, the funds are automatically returned to the sender. Use this call to cancel the unclaimed item before the automatic 30-day refund. A successful request returns the HTTP 200 OK status code and a JSON response body with the payout_item_details object that shows canceled payout details including a RETURNED transaction status.",
+        "operationId": "cancelUnclaimedPayoutItem",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/json",
+          "application/xml"
+        ],
+        "parameters": [
+          {
+            "name": "payout_item_id",
+            "in": "path",
+            "description": "Specify a payout item ID followed by the /cancel action in the URI. The show batch payout details call shows payout item IDs in payout_item_id fields. You can cancel only payout items with a transaction_status of UNCLAIMED.",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#definitions/PayoutItemDetails"
             }
           }
         },
@@ -183,7 +264,7 @@
       },
       "type": "object"
     },
-    "Currency": {
+    "CurrencyObject": {
       "properties": {
         "currency": {
           "description": "3 letter currency code",
@@ -256,7 +337,7 @@
           "description": "A JSON pointer. References a location in the target document where the operation is performed."
         },
         "value": {
-          "type": "object",
+          "type": "string",
           "description": "The value to apply. The remove operation does not require a value."
         },
         "from": {
@@ -316,10 +397,10 @@
           "$ref": "#definitions/SenderBatchHeader"
         },
         "amount": {
-          "$ref": "#definitions/Currency"
+          "$ref": "#definitions/CurrencyObject"
         },
         "fees": {
-          "$ref": "#definitions/Currency"
+          "$ref": "#definitions/CurrencyObject"
         },
         "errors": {
           "$ref": "#definitions/Error"
@@ -330,10 +411,16 @@
     "PayoutItem": {
       "properties": {
         "recipient_type": {
-          "$ref": "#/definitions/RecipientEnum"
+          "type": "string",
+          "description": "The type of ID that identifies the payment receiver. Value is: EMAIL- Unencrypted email. Value is a string of up to 127 single-byte characters. PHONE- Unencrypted phone number. Note: The PayPal sandbox does not support the PHONE recipient type. PAYPAL_ID- Encrypted PayPal account number. If the sender_batch_header includes the recipient_type attribute, any payout item without its own recipient_type attribute uses the recipient_type value from sender_batch_header. If the sender_batch_header omits the recipient_type attribute, each payout item must include its own recipient_type value.",
+          "enum": [
+            "EMAIL",
+            "PHONE",
+            "PAYPAL_ID"
+          ]
         },
         "amount": {
-          "$ref": "#definitions/Currency"
+          "$ref": "#definitions/CurrencyObject"
         },
         "note": {
           "type": "string",
@@ -364,7 +451,7 @@
           "$ref": "#definitions/TransactionEnum"
         },
         "payout_item_fee": {
-          "$ref": "#definitions/Currency"
+          "$ref": "#definitions/CurrencyObject"
         },
         "payout_batch_id": {
           "type": "string",
@@ -424,16 +511,17 @@
       },
       "type": "object"
     },
-    "RecipientEnum": {
+    "PayoutsBatchDetailsResponse": {
       "properties": {
-        "recipient_enum": {
-          "type": "string",
-          "description": "The type of ID that identifies the payment receiver. Value is: EMAIL- Unencrypted email. Value is a string of up to 127 single-byte characters. PHONE- Unencrypted phone number. Note: The PayPal sandbox does not support the PHONE recipient type. PAYPAL_ID- Encrypted PayPal account number. If the sender_batch_header includes the recipient_type attribute, any payout item without its own recipient_type attribute uses the recipient_type value from sender_batch_header. If the sender_batch_header omits the recipient_type attribute, each payout item must include its own recipient_type value.",
-          "enum": [
-            "EMAIL",
-            "PHONE",
-            "PAYPAL_ID"
-          ]
+        "batch_header": {
+          "$ref": "#definitions/PayoutBatchHeader"
+        },
+        "items": {
+          "type": "array",
+          "description": "A sender-created payout to a single recipient.",
+          "items": {
+            "$ref": "#definitions/PayoutItemDetails"
+          }
         }
       },
       "type": "object"
@@ -445,7 +533,13 @@
           "description": "A sender-specified ID number. Tracks the batch payout in an accounting system. Note: PayPal prevents duplicate batches from being processed. If you specify a sender_batch_id that was used in the last 30 days, the API rejects the request and returns an error message that indicates the duplicate sender_batch_id and includes a HATEOAS link to the original batch payout with the same sender_batch_id. If you receive an HTTP 5nn status code, you can safely retry the request with the same sender_batch_id. In any case, the API completes a payment only once for a specific sender_batch_id that is used within 30 days."
         },
         "recipient_type": {
-          "$ref": "#definitions/RecipientEnum"
+          "type": "string",
+          "description": "The type of ID that identifies the payment receiver. Value is: EMAIL- Unencrypted email. Value is a string of up to 127 single-byte characters. PHONE- Unencrypted phone number. Note: The PayPal sandbox does not support the PHONE recipient type. PAYPAL_ID- Encrypted PayPal account number. If the sender_batch_header includes the recipient_type attribute, any payout item without its own recipient_type attribute uses the recipient_type value from sender_batch_header. If the sender_batch_header omits the recipient_type attribute, each payout item must include its own recipient_type value.",
+          "enum": [
+            "EMAIL",
+            "PHONE",
+            "PAYPAL_ID"
+          ]
         },
         "email_subject": {
           "type": "string",

@@ -1,5 +1,5 @@
 {
-  "swagger": 2,
+  "swagger": "2.0",
   "schemes": [
     "https"
   ],
@@ -35,9 +35,8 @@
       "type": "oauth2"
     },
     "Oauth2c": {
-      "authorizationUrl": "https://www.sandbox.paypal.com/signin/authorize",
       "description": "Oauth 2.0 accessCode authentication",
-      "flow": "accessCode",
+      "flow": "application",
       "scopes": {
         "https://uri.paypal.com/services/vault": "Vault",
         "openid": "Login"
@@ -71,7 +70,7 @@
             "description": "Object containing credit card details for the request to store a credit card.",
             "required": true,
             "schema": {
-              "$ref": null
+              "$ref": "#/definitions/StoreRequest"
             }
           }
         ],
@@ -79,7 +78,7 @@
           "201": {
             "description": "Client request successful",
             "schema": {
-              "$ref": null
+              "$ref": "#/definitions/CreditCard"
             }
           }
         },
@@ -111,74 +110,71 @@
             "in": "query",
             "description": "The number of vaulted credit cards to list in the response beginning with the specified page.",
             "type": "integer",
-            "format": "int64",
-            "default": 10
+            "format": "int64"
           },
-          {
+		  {
             "name": "page",
             "in": "query",
             "description": "A zero-relative index of the list of vaulted credit cards.",
             "type": "integer",
-            "format": "int64",
-            "default": 1
+            "format": "int64"
           },
-          {
-            "name": "start_time",
-            "in": "query",
+		  {
+			"name": "start_time",
+			"in": "query",
             "description": "Filters the vaulted credit cards in the response to those created on or after this date and time and on or before the end_time value. Both values are in Internet date and time format. For example, 2017-11-05T13:15:30Z.",
             "type": "string"
-          },
-          {
-            "name": "end_time",
-            "in": "query",
+		  },
+		  {
+			"name": "end_time",
+			"in": "query",
             "description": "Filters the vaulted credit cards in the response to those created on or after the start_time date and time and on or before this value. Both values are in Internet date and time format. For example, 2017-11-05T13:15:30Z.",
             "type": "string"
-          },
-          {
-            "name": "sort_order",
-            "in": "query",
+		  },
+		  {
+			"name": "sort_order",
+			"in": "query",
             "description": "Sorts the vaulted credit cards in the response in ascending or descending order. Value is asc for ascending order or desc for descending order.",
-            "type": "string",
-            "default": "desc"
-          },
-          {
-            "name": "sort_by",
-            "in": "query",
+            "type": "string"
+		  },
+		  {
+			"name": "sort_by",
+			"in": "query",
             "description": "Sorts the vaulted credit cards in the response by either create_time or update_time.",
-            "type": "string",
-            "default": "create_time"
-          },
-          {
-            "name": "merchant_id",
-            "in": "query",
+            "type": "string"
+		  },
+		  {
+			"name": "merchant_id",
+			"in": "query",
             "description": "Filters the vaulted credit cards in the response to those associated with this merchant ID. This value is a user-provided unique ID for the merchant who holds the card. Note: This parameter is not related to the PayPal merchant ID.",
             "type": "string"
-          },
-          {
-            "name": "external_card_id",
-            "in": "query",
+		  },
+		  {
+			"name": "external_card_id",
+			"in": "query",
             "description": "Filters the vaulted credit cards in the response to those associated with this facilitator-provided ID of the bank account.",
             "type": "string"
-          },
-          {
-            "name": "external_customer_id",
-            "in": "query",
+		  },
+		  {
+			"name": "external_customer_id",
+			"in": "query",
             "description": "Filters the vaulted credit cards in the response to those associated with this externally-provided customer ID.",
             "type": "string"
-          },
-          {
+		  },
+		  {
             "name": "total_required",
             "in": "query",
             "description": "Indicates whether the response returns the total_items and total_pages values. Default is true. Set to false to omit these values from the response.",
-            "type": "boolean",
-            "default": true
+            "type": "boolean"
           }
+		  
+		  
         ],
         "responses": {
           "200": {
             "description": "Client request successful",
             "schema": {
-              "$ref": null
+              "$ref": "#/definitions/CreditCardList"
             }
           }
         },
@@ -194,7 +190,7 @@
         ]
       }
     },
-    "/credit-cards/{credit_card_id}": {
+	"/credit-cards/{credit_card_id}": {
       "get": {
         "description": "Shows details for a vaulted credit card, by ID. A successful request returns the HTTP 200 OK status code and a JSON response body with card details.",
         "operationId": "showCreditCardDetails",
@@ -219,7 +215,7 @@
           "200": {
             "description": "Client request successful",
             "schema": {
-              "$ref": null
+              "$ref": "#/definitions/CreditCard"
             }
           }
         },
@@ -253,13 +249,16 @@
             "required": true,
             "type": "string"
           },
-          {
+		  {
             "name": "updateRequest",
             "in": "body",
             "description": "A JSON patch object that you can use to apply partial updates to resources.",
             "required": true,
             "schema": {
-              "$ref": null
+			  "type": "array",
+			  "items": {
+			    "$ref": "#/definitions/JsonPatch"
+			  }
             }
           }
         ],
@@ -267,7 +266,7 @@
           "200": {
             "description": "Client request successful",
             "schema": {
-              "$ref": null
+              "$ref": "#/definitions/CreditCard"
             }
           }
         },
@@ -282,7 +281,7 @@
           "vault"
         ]
       },
-      "delete": {
+	  "delete": {
         "description": "Deletes a vaulted credit card, by ID.",
         "operationId": "deleteCreditCard",
         "consumes": [
@@ -327,244 +326,258 @@
           "type": "string",
           "description": "The first line of the address. For example, number, street, and so on."
         },
-        "line2": {
+		"line2": {
           "type": "string",
           "description": "Optional. The second line of the address. For example, suite, apt number, and so on."
         },
-        "city": {
+		"city": {
           "type": "string",
           "description": "The city name."
         },
-        "country_code": {
+		"country_code": {
           "type": "string",
           "description": "The two-letter code for a US state. Use the equivalent for other countries."
         },
-        "postal_code": {
+		"postal_code": {
           "type": "string",
           "description": "The postal code, which is the zip code or equivalent. Typically required for countries with postal codes. For countries that have postal codes or an equivalent, see Postal code."
         },
-        "state": {
+		"state": {
           "type": "string",
-          "description": "The two-character ISO 3166-1 code that identifies the country or region. Note: The country code for Great Britain is GB and not UK as is used in that countrys top-level domain names. Use the C2 country code for CHINA WORLDWIDE (for CUP, bank card, and cross-border transactions)."
+          "description": "The two-character ISO 3166-1 code that identifies the country or region. Note: The country code for Great Britain is GB and not UK as is used in that country's top-level domain names. Use the C2 country code for CHINA WORLDWIDE (for CUP, bank card, and cross-border transactions)."
         },
-        "phone": {
+		"phone": {
           "type": "string",
           "description": "A phone number. Must be represented in its canonical international format, as defined by the E.164 numbering plan."
         }
       },
       "type": "object"
     },
-    "CreditCard": {
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "The ID of the vaulted credit card. You can use this ID to fund a payment."
-        },
-        "number": {
-          "type": "string",
-          "description": "The credit card number. Valid value is a string of numeric characters with no spaces or punctuation. Must conform to modulo and the length required by its credit card type. Redacted in responses."
-        },
-        "type": {
-          "type": "string",
-          "description": "The credit card type."
-        },
-        "expire_month": {
-          "type": "integer",
-          "format": "int64",
-          "description": "The one- to two-digit month when the card expires, with no leading zero. For example, 1 or 12."
-        },
-        "expire_year": {
-          "type": "integer",
-          "format": "int64",
-          "description": "The four-digit year when the card expires. For example, 2017."
-        },
-        "first_name": {
-          "type": "string",
-          "description": "The first name of the credit card holder. Maximum length is 25 characters."
-        },
-        "last_name": {
-          "type": "string",
-          "description": "The last name of the credit card holder."
-        },
-        "billing_address": {
-          "$ref": null
-        },
-        "external_customer_id": {
-          "type": "string",
-          "description": "The externally-provided ID of the customer for whom to list credit cards."
-        },
-        "merchant_id": {
-          "type": "string",
-          "description": "The ID of the merchant for whom to list credit cards."
-        },
-        "payer_id": {
-          "type": "string",
-          "description": "A unique ID that you can assign and track when you vault a credit card or use a vaulted credit card to make a payment. This ID can help to avoid unintentional use or misuse of credit cards. Can be any value, such as a UUID, user name, or email address. This is being deprecated in favor of the external_customer_id property."
-        },
-        "external_card_id": {
-          "type": "string",
-          "description": "The externally-provided ID of the credit card."
-        },
-        "state": {
-          "type": "string",
-          "description": "The state of the credit card funding instrument."
-        },
-        "create_time": {
-          "type": "string",
-          "description": "The date and time when the vaulted credit card was created, in Internet date and time format. For example, 2017-11-05T13:15:30Z."
-        },
-        "update_time": {
-          "type": "string",
-          "description": "The date and time when the vaulted credit card was updated, in Internet date and time format. For example, 2017-11-05T13:15:30Z."
-        },
-        "valid_until": {
-          "type": "string",
-          "description": "The date and time when the credit card becomes unusable from the vault, in Internet date and time format. The valid_until parameter is not the same as the expiration month and year. The expiration month and year might be later than the valid_until date. For example, the card expires in November 2019 but the valid_until date is October 17th, 2019."
-        },
-        "links": {
-          "type": "array",
-          "description": "HATEOAS links related to this call.",
-          "items": {
-            "$ref": null
-          }
-        }
-      },
-      "type": "object"
-    },
-    "StoreRequest": {
-      "required": [
-        "number",
-        "type",
-        "expire_month",
-        "expire_year"
-      ],
-      "properties": {
-        "number": {
-          "type": "string",
-          "description": "The credit card number. Valid value is a string of numeric characters with no spaces or punctuation. Must conform to modulo and the length required by its credit card type. Redacted in responses."
-        },
-        "type": {
-          "type": "string",
-          "description": "The credit card type."
-        },
-        "expire_month": {
-          "type": "integer",
-          "format": "int64",
-          "description": "The one- to two-digit month when the card expires, with no leading zero. For example, 1 or 12."
-        },
-        "expire_year": {
-          "type": "integer",
-          "format": "int64",
-          "description": "The four-digit year when the card expires. For example, 2017."
-        },
-        "first_name": {
-          "type": "string",
-          "description": "The first name of the credit card holder. Maximum length is 25 characters."
-        },
-        "last_name": {
-          "type": "string",
-          "description": "The last name of the credit card holder."
-        },
-        "billing_address": {
-          "$ref": null
-        },
-        "external_customer_id": {
-          "type": "string",
-          "description": "The externally-provided ID of the customer for whom to list credit cards."
-        },
-        "merchant_id": {
-          "type": "string",
-          "description": "The ID of the merchant for whom to list credit cards."
-        },
-        "payer_id": {
-          "type": "string",
-          "description": "A unique ID that you can assign and track when you vault a credit card or use a vaulted credit card to make a payment. This ID can help to avoid unintentional use or misuse of credit cards. Can be any value, such as a UUID, user name, or email address. This is being deprecated in favor of the external_customer_id property."
-        },
-        "external_card_id": {
-          "type": "string",
-          "description": "The externally-provided ID of the credit card."
-        }
-      },
-      "type": "object"
-    },
-    "CreditCardList": {
-      "properties": {
-        "items": {
-          "type": "array",
-          "description": "A vaulted credit card. To fund a payment, use the ID of the vaulted card.",
-          "items": {
-            "$ref": null
-          }
-        },
-        "links": {
-          "type": "array",
-          "description": "HATEOAS links related to this call.",
-          "items": {
-            "$ref": null
-          }
-        },
-        "total_items": {
-          "type": "integer",
-          "format": "int64",
-          "description": "The total number of items."
-        },
-        "total_pages": {
-          "type": "integer",
-          "format": "int64",
-          "description": "The total number of pages."
-        }
-      },
-      "type": "object"
-    },
-    "JsonPatch": {
-      "properties": {
-        "op": {
-          "type": "string",
-          "description": "The operation to perform."
-        },
-        "path": {
-          "type": "string",
-          "description": "A JSON pointer. References a location in the target document where the operation is performed."
-        },
-        "value": {
-          "type": "object",
-          "description": "The value to apply. The remove operation does not require a value."
-        },
-        "from": {
-          "type": "string",
-          "description": "A JSON pointer. References the location in the target document from which to move the value. Required for the move operation."
-        }
-      },
-      "type": "object"
-    },
-    "JsonPatchRequest": {
-      "properties": {
-        "items": {
-          "type": "array",
-          "description": "A JSON patch object that you can use to apply partial updates to resources.",
-          "items": {
-            "$ref": null
-          }
-        }
-      },
-      "type": "object"
-    },
-    "Link": {
-      "properties": {
-        "href": {
-          "type": "string",
-          "description": "The URL of the related HATEOAS link that you can use for subsequent calls."
-        },
-        "rel": {
-          "type": "string",
-          "description": "The link relationship. Describes how this link relates to the previous call. For example, use a self link to show details for the current call. Use a parent_payment link to show details for the parent payment. The rel value can also be a related call, such as execute or refund."
-        },
-        "method": {
-          "type": "string",
-          "description": "The HTTP method required to make the related call."
-        }
-      },
-      "type": "object"
-    }
+	"CreditCard": {
+		"properties": {
+			"id": {
+			  "type": "string",
+			  "description": "The ID of the vaulted credit card. You can use this ID to fund a payment."
+			},
+			"number": {
+			  "type": "string",
+			  "description": "The credit card number. Valid value is a string of numeric characters with no spaces or punctuation. Must conform to modulo and the length required by its credit card type. Redacted in responses."
+			},
+			"type": {
+			  "type": "string",
+			  "description": "The credit card type.",
+			  "enum": [
+				"visa",
+				"mastercard",
+				"amex",
+				"discover",
+				"maestro"
+			  ]
+			},
+			"expire_month": {
+			  "type": "integer",
+			  "format": "int64",
+			  "description": "The one- to two-digit month when the card expires, with no leading zero. For example, 1 or 12."
+			},
+			"expire_year": {
+			  "type": "integer",
+			  "format": "int64",
+			  "description": "The four-digit year when the card expires. For example, 2017."
+			},
+			"first_name": {
+			  "type": "string",
+			  "description": "The first name of the credit card holder. Maximum length is 25 characters."
+			},
+			"last_name": {
+			  "type": "string",
+			  "description": "The last name of the credit card holder."
+			},
+			"billing_address": {
+			  "$ref": "#/definitions/Address"
+			},
+			"external_customer_id": {
+			  "type": "string",
+			  "description": "The externally-provided ID of the customer for whom to list credit cards."
+			},
+			"merchant_id": {
+			  "type": "string",
+			  "description": "The ID of the merchant for whom to list credit cards."
+			},
+			"payer_id": {
+			  "type": "string",
+			  "description": "A unique ID that you can assign and track when you vault a credit card or use a vaulted credit card to make a payment. This ID can help to avoid unintentional use or misuse of credit cards. Can be any value, such as a UUID, user name, or email address. This is being deprecated in favor of the external_customer_id property."
+			},
+			"external_card_id": {
+			  "type": "string",
+			  "description": "The externally-provided ID of the credit card."
+			},
+			"state": {
+			  "type": "string",
+			  "description": "The state of the credit card funding instrument.",
+			  "enum": [
+			  "expired",
+			  "ok"
+			  ]
+			},
+			"create_time": {
+			  "type": "string",
+			  "description": "The date and time when the vaulted credit card was created, in Internet date and time format. For example, 2017-11-05T13:15:30Z."
+			},
+			"update_time": {
+			  "type": "string",
+			  "description": "The date and time when the vaulted credit card was updated, in Internet date and time format. For example, 2017-11-05T13:15:30Z."
+			},
+			"valid_until": {
+			  "type": "string",
+			  "description": "The date and time when the credit card becomes unusable from the vault, in Internet date and time format. The valid_until parameter is not the same as the expiration month and year. The expiration month and year might be later than the valid_until date. For example, the card expires in November 2019 but the valid_until date is October 17th, 2019."
+			},
+			"links": {
+			  "type": "array",
+			  "description": "HATEOAS links related to this call.",
+			  "items": {
+				"$ref": "#/definitions/Link"
+			  }
+			}
+		},
+	"type": "object"
+	},
+	"StoreRequest": {
+		"required": [
+            "number",
+			"type",
+			"expire_month",
+			"expire_year"
+          ],
+		"properties": {
+			"number": {
+			  "type": "string",
+			  "description": "The credit card number. Valid value is a string of numeric characters with no spaces or punctuation. Must conform to modulo and the length required by its credit card type. Redacted in responses."
+			},
+			"type": {
+			  "type": "string",
+			  "description": "The credit card type.",
+			  "enum": [
+				"visa",
+				"mastercard",
+				"amex",
+				"discover",
+				"maestro"
+			  ]
+			},
+			"expire_month": {
+			  "type": "integer",
+			  "format": "int64",
+			  "description": "The one- to two-digit month when the card expires, with no leading zero. For example, 1 or 12."
+			},
+			"expire_year": {
+			  "type": "integer",
+			  "format": "int64",
+			  "description": "The four-digit year when the card expires. For example, 2017."
+			},
+			"first_name": {
+			  "type": "string",
+			  "description": "The first name of the credit card holder. Maximum length is 25 characters."
+			},
+			"last_name": {
+			  "type": "string",
+			  "description": "The last name of the credit card holder."
+			},
+			"billing_address": {
+			  "$ref": "#/definitions/Address"
+			},
+			"external_customer_id": {
+			  "type": "string",
+			  "description": "The externally-provided ID of the customer for whom to list credit cards."
+			},
+			"merchant_id": {
+			  "type": "string",
+			  "description": "The ID of the merchant for whom to list credit cards."
+			},
+			"payer_id": {
+			  "type": "string",
+			  "description": "A unique ID that you can assign and track when you vault a credit card or use a vaulted credit card to make a payment. This ID can help to avoid unintentional use or misuse of credit cards. Can be any value, such as a UUID, user name, or email address. This is being deprecated in favor of the external_customer_id property."
+			},
+			"external_card_id": {
+			  "type": "string",
+			  "description": "The externally-provided ID of the credit card."
+			}
+		},
+		"type": "object"
+	},
+	"CreditCardList": {
+		"properties": {
+			"items": {
+			  "type": "array",
+			  "description": "A vaulted credit card. To fund a payment, use the ID of the vaulted card.",
+			  "items": {
+				"$ref": "#/definitions/CreditCard"
+			  }
+			},
+			"links": {
+			  "type": "array",
+			  "description": "HATEOAS links related to this call.",
+			  "items": {
+				"$ref": "#/definitions/Link"
+			  }
+			},
+			"total_items": {
+			  "type": "integer",
+			  "format": "int64",
+			  "description": "The total number of items."
+			},
+			"total_pages": {
+			  "type": "integer",
+			  "format": "int64",
+			  "description": "The total number of pages."
+			}
+		},
+	"type": "object"
+	},
+	"JsonPatch": {
+		"properties": {
+			"op": {
+			  "type": "string",
+			  "description": "The operation to perform.",
+			  "enum": [
+				"add",
+				"remove",
+				"replace",
+				"move",
+				"copy",
+				"test"
+			  ]
+			},
+			"path": {
+			  "type": "string",
+			  "description": "A JSON pointer. References a location in the target document where the operation is performed."
+			},
+			"value": {
+			  "type": "string",
+			  "description": "The value to apply. The remove operation does not require a value."
+			},
+			"from": {
+			  "type": "string",
+			  "description": "A JSON pointer. References the location in the target document from which to move the value. Required for the move operation."
+			}
+		},
+		"type": "object"
+	},
+	"Link": {
+	"properties": {
+		"href": {
+			"type": "string",
+			"description": "The URL of the related HATEOAS link that you can use for subsequent calls."
+		},
+		"rel": {
+			"type": "string",
+			"description": "The link relationship. Describes how this link relates to the previous call. For example, use a self link to show details for the current call. Use a parent_payment link to show details for the parent payment. The rel value can also be a related call, such as execute or refund."
+		},
+		"method": {
+			"type": "string",
+			"description": "The HTTP method required to make the related call."
+		}	
+	},
+	"type": "object"
+	}
   }
 }
