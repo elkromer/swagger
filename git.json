@@ -1,0 +1,1474 @@
+{
+  "swagger": "2.0",
+  "schemes": [
+    "https"
+  ],
+  "host": "api.github.com",
+  "basePath": "/",
+  "info": {
+    "description": "Powerful collaboration, code review, and code management for open source and private projects.\n",
+    "termsOfService": "https://help.github.com/articles/github-terms-of-service/#b-api-terms",
+    "title": "Git Data API",
+    "version": "v3"
+  },
+  "externalDocs": {
+    "url": "https://developer.github.com/v3/"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "oauth_2_0": {
+      "authorizationUrl": "https://github.com/login/oauth/authorize",
+      "description": "OAuth2 is a protocol that lets external apps request authorization to private details in a user's GitHub account without getting their password. This is preferred over Basic Authentication because tokens can be limited to specific types of data, and can be revoked by users at any time.",
+      "flow": "accessCode",
+      "scopes": {
+        "admin:org": "",
+        "admin:org_hook": "",
+        "admin:public_key": "",
+        "admin:repo_hook": "",
+        "delete_repo": "",
+        "gist": "",
+        "notifications": "",
+        "public_repo": "",
+        "read:org": "",
+        "read:public_key": "",
+        "read:repo_hook": "",
+        "repo": "",
+        "repo:status": "",
+        "repo_deployment": "",
+        "user": "",
+        "user:email": "",
+        "user:follow": "",
+        "write:org": "",
+        "write:public_key": "",
+        "write:repo_hook": ""
+      },
+      "tokenUrl": "https://github.com/login/oauth/access_token",
+      "type": "oauth2"
+    }
+  },
+  "tags": [
+    "gitData",
+    "repositories"
+  ],
+  "paths": {
+    "/repos/{owner}/{repo}": {
+      "patch": {
+        "description": "edit a repository",
+        "operationId": "updateRepository",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "repo",
+            "in": "body",
+            "description": "updated repository details",
+            "schema": {
+              "$ref": "#/definitions/RepositoryPost"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/Repository"
+            }
+          }
+        },
+        "tags": [
+          "repositories"
+        ]
+      }
+    },
+    "/repos/{owner}/{repo}/git/blobs/{sha}": {
+      "get": {
+        "description": "Get blob",
+        "operationId": "getBlob",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The owner of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "sha",
+            "in": "path",
+            "description": "The sha hash of the blob",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/Blob"
+            }
+          }
+        },
+        "tags": [
+          "gitData"
+        ]
+      }
+    },
+    "/repos/{owner}/{repo}/git/blobs": {
+      "post": {
+        "description": "Create blob",
+        "operationId": "createBlob",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The owner of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repo",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/Blob"
+            }
+          }
+        },
+        "tags": [
+          "gitData"
+        ]
+      }
+    },
+    "/repos/{owner}/{repo}/git/commits/{sha}": {
+      "get": {
+        "description": "Get commit",
+        "operationId": "getCommit",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The owner of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "sha",
+            "in": "path",
+            "description": "The sha hash of the commit",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/Commit"
+            }
+          }
+        },
+        "tags": [
+          "gitData"
+        ]
+      }
+    },
+    "/repos/{owner}/{repo}/git/commits": {
+      "post": {
+        "description": "Create commit",
+        "operationId": "createCommit",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The owner of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "commit",
+            "in": "body",
+            "description": "The commit object to create",
+            "schema": {
+              "$ref": "#/definitions/Commit"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/Commit"
+            }
+          }
+        },
+        "tags": [
+          "gitData"
+        ]
+      }
+    },
+    "/repos/{owner}/{repo}/git/refs/{ref}": {
+      "get": {
+        "description": "get a Reference",
+        "operationId": "getReference",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The owner of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "ref",
+            "in": "path",
+            "description": "The name of the reference to get",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/Reference"
+            }
+          }
+        },
+        "tags": [
+          "gitData"
+        ]
+      },
+      "patch": {
+        "description": "update a reference",
+        "operationId": "updateReference",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The owner of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "ref",
+            "in": "path",
+            "description": "The name of the reference to get",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "reference",
+            "in": "body",
+            "description": "The reference object to create",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ReferencePatch"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Reference"
+              }
+            }
+          }
+        },
+        "tags": [
+          "gitData"
+        ]
+      },
+      "delete": {
+        "description": "delete a reference",
+        "operationId": "deleteReference",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The owner of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "ref",
+            "in": "path",
+            "description": "The name of the reference to get",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Client request successful"
+          }
+        },
+        "tags": [
+          "gitData"
+        ]
+      }
+    },
+    "/repos/{owner}/{repo}/git/refs": {
+      "get": {
+        "description": "get all References",
+        "operationId": "getAllReferences",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The owner of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repo",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Reference"
+              }
+            }
+          }
+        },
+        "tags": [
+          "gitData"
+        ]
+      },
+      "post": {
+        "description": "create a reference",
+        "operationId": "createReference",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The owner of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "reference",
+            "in": "body",
+            "description": "The reference object to create",
+            "schema": {
+              "$ref": "#/definitions/ReferencePost"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/Reference"
+            }
+          }
+        },
+        "tags": [
+          "gitData"
+        ]
+      }
+    },
+    "/repos/{owner}/{repo}/git/tags/{sha}": {
+      "get": {
+        "description": "get tag",
+        "operationId": "getTag",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The owner of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "sha",
+            "in": "path",
+            "description": "The sha hash of the tag",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/Tag"
+            }
+          }
+        },
+        "tags": [
+          "gitData"
+        ]
+      }
+    },
+    "/repos/{owner}/{repo}/git/tags/": {
+      "post": {
+        "description": "create tag",
+        "operationId": "createTag",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The owner of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "tag",
+            "in": "body",
+            "description": "The sha hash of the tag",
+            "schema": {
+              "$ref": "#/definitions/Tag"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/Tag"
+            }
+          }
+        },
+        "tags": [
+          "gitData"
+        ]
+      }
+    },
+    "/repos/{owner}/{repo}/git/trees/{sha}": {
+      "get": {
+        "description": "get tree",
+        "operationId": "getTree",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The owner of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "sha",
+            "in": "path",
+            "description": "The sha hash of the tree",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/Tree"
+            }
+          }
+        },
+        "tags": [
+          "gitData"
+        ]
+      }
+    },
+    "/repos/{owner}/{repo}/git/trees/": {
+      "post": {
+        "description": "create tree",
+        "operationId": "createTree",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "owner",
+            "in": "path",
+            "description": "The owner of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "repo",
+            "in": "path",
+            "description": "The name of the repo",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "tree",
+            "in": "body",
+            "description": "The simplified tree object to send to github",
+            "schema": {
+              "$ref": "#/definitions/TreePost"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/Tree"
+            }
+          }
+        },
+        "tags": [
+          "gitData"
+        ]
+      }
+    },
+    "/user/repos": {
+      "get": {
+        "description": "get repositories",
+        "operationId": "getRepositories",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "visibility",
+            "in": "query",
+            "description": "Can be one of all, public, or private. Default: all",
+            "type": "string"
+          },
+          {
+            "name": "affiliation",
+            "in": "query",
+            "description": "\"owner\", \"collaborator\", \"organization_member\" comma separated list",
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Can be one of all, owner, public, private, member. Default: all. Will cause a 422 error if used in the same request as visibility or affiliation.",
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Can be one of created, updated, pushed, full_name. Default: full_name",
+            "type": "string"
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "description": "Can be one of asc or desc. Default: when using full_name: asc; otherwise desc",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Repository"
+              }
+            }
+          }
+        },
+        "tags": [
+          "repositories"
+        ]
+      }
+    },
+    "/users/{username}/repos": {
+      "get": {
+        "description": "get a specific user's repositories",
+        "operationId": "getUserRepositories",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Can be one of all, owner, public, private, member. Default: all. Will cause a 422 error if used in the same request as visibility or affiliation.",
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Can be one of created, updated, pushed, full_name. Default: full_name",
+            "type": "string"
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "description": "Can be one of asc or desc. Default: when using full_name: asc; otherwise desc",
+            "type": "string"
+          },
+          {
+            "name": "username",
+            "in": "path",
+            "description": "user name",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Repository"
+              }
+            }
+          }
+        },
+        "tags": [
+          "repositories"
+        ]
+      }
+    },
+    "/orgs/{org}/repos": {
+      "get": {
+        "description": "get a specific user's repositories",
+        "operationId": "getOrgRepositories",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Can be one of all, owner, public, private, member. Default: all. Will cause a 422 error if used in the same request as visibility or affiliation.",
+            "type": "string"
+          },
+          {
+            "name": "org",
+            "in": "path",
+            "description": "organization name",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Repository"
+              }
+            }
+          }
+        },
+        "tags": [
+          "repositories"
+        ]
+      },
+      "post": {
+        "description": "create a repository at the organization endpoint. note only the organization endpoint is available for Git Apps",
+        "operationId": "createOrgRepository",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "repo",
+            "in": "body",
+            "description": "Repo to create.",
+            "schema": {
+              "$ref": "#/definitions/RepositoryPost"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Client request successful",
+            "schema": {
+              "$ref": "#/definitions/Repository"
+            }
+          }
+        },
+        "tags": [
+          "repositories"
+        ]
+      }
+    },
+    "/repositories": {
+      "get": {
+        "description": "get all public repositories",
+        "operationId": "getAllRepositories",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "since",
+            "in": "query",
+            "description": "The integer ID of the last Repository that you've seen.",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client request successful",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Repository"
+              }
+            }
+          }
+        },
+        "tags": [
+          "repositories"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "RepositoryPost": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "homepage": {
+          "type": "string"
+        },
+        "private": {
+          "type": "boolean"
+        },
+        "has_issues": {
+          "type": "boolean"
+        },
+        "has_projects": {
+          "type": "boolean"
+        },
+        "has_wiki": {
+          "type": "boolean"
+        },
+        "team_id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "auto_init": {
+          "type": "boolean"
+        },
+        "gitignore_template": {
+          "type": "string"
+        },
+        "license_template": {
+          "type": "string"
+        },
+        "allow_squash_merge": {
+          "type": "boolean"
+        },
+        "allow_merge_commit": {
+          "type": "boolean"
+        },
+        "allow_rebase_merge": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "User": {
+      "properties": {
+        "login": {
+          "type": "string"
+        },
+        "avatar_url": {
+          "type": "string"
+        },
+        "gravatar_id": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "html_url": {
+          "type": "string"
+        },
+        "followers_url": {
+          "type": "string"
+        },
+        "following_url": {
+          "type": "string"
+        },
+        "gists_url": {
+          "type": "string"
+        },
+        "starred_url": {
+          "type": "string"
+        },
+        "subscriptions_url": {
+          "type": "string"
+        },
+        "organizations_url": {
+          "type": "string"
+        },
+        "repos_url": {
+          "type": "string"
+        },
+        "events_url": {
+          "type": "string"
+        },
+        "received_events_url": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "site_admin": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "Permission": {
+      "properties": {
+        "admin": {
+          "type": "boolean"
+        },
+        "push": {
+          "type": "boolean"
+        },
+        "pull": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "Repository": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "owner": {
+          "$ref": "#/definitions/User"
+        },
+        "name": {
+          "type": "string"
+        },
+        "full_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "html_url": {
+          "type": "string"
+        },
+        "archive_url": {
+          "type": "string"
+        },
+        "assignees_url": {
+          "type": "string"
+        },
+        "blobs_url": {
+          "type": "string"
+        },
+        "branches_url": {
+          "type": "string"
+        },
+        "clone_url": {
+          "type": "string"
+        },
+        "collaborators_url": {
+          "type": "string"
+        },
+        "comments_url": {
+          "type": "string"
+        },
+        "commits_url": {
+          "type": "string"
+        },
+        "compare_url": {
+          "type": "string"
+        },
+        "contents_url": {
+          "type": "string"
+        },
+        "contributors_url": {
+          "type": "string"
+        },
+        "deployments_url": {
+          "type": "string"
+        },
+        "downloads_url": {
+          "type": "string"
+        },
+        "events_url": {
+          "type": "string"
+        },
+        "forks_url": {
+          "type": "string"
+        },
+        "git_commits_url": {
+          "type": "string"
+        },
+        "git_refs_url": {
+          "type": "string"
+        },
+        "git_tags_url": {
+          "type": "string"
+        },
+        "git_url": {
+          "type": "string"
+        },
+        "hooks_url": {
+          "type": "string"
+        },
+        "issue_comment_url": {
+          "type": "string"
+        },
+        "issue_events_url": {
+          "type": "string"
+        },
+        "issues_url": {
+          "type": "string"
+        },
+        "keys_url": {
+          "type": "string"
+        },
+        "labels_url": {
+          "type": "string"
+        },
+        "languages_url": {
+          "type": "string"
+        },
+        "merges_url": {
+          "type": "string"
+        },
+        "milestones_url": {
+          "type": "string"
+        },
+        "mirror_url": {
+          "type": "string"
+        },
+        "notifications_url": {
+          "type": "string"
+        },
+        "pulls_url": {
+          "type": "string"
+        },
+        "releases_url": {
+          "type": "string"
+        },
+        "ssh_url": {
+          "type": "string"
+        },
+        "stargazers_url": {
+          "type": "string"
+        },
+        "statuses_url": {
+          "type": "string"
+        },
+        "subscribers_url": {
+          "type": "string"
+        },
+        "subscription_url": {
+          "type": "string"
+        },
+        "svn_url": {
+          "type": "string"
+        },
+        "tags_url": {
+          "type": "string"
+        },
+        "teams_url": {
+          "type": "string"
+        },
+        "trees_url": {
+          "type": "string"
+        },
+        "homepage": {
+          "type": "string"
+        },
+        "private": {
+          "type": "boolean"
+        },
+        "fork": {
+          "type": "boolean"
+        },
+        "has_issues": {
+          "type": "boolean"
+        },
+        "has_wiki": {
+          "type": "boolean"
+        },
+        "has_pages": {
+          "type": "boolean"
+        },
+        "has_downloads": {
+          "type": "boolean"
+        },
+        "allow_rebase_merge": {
+          "type": "boolean"
+        },
+        "allow_squash_merge": {
+          "type": "boolean"
+        },
+        "allow_merge_commit": {
+          "type": "boolean"
+        },
+        "forks_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "stargazers_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "watchers_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "size": {
+          "type": "number",
+          "format": "double"
+        },
+        "default_branch": {
+          "type": "string"
+        },
+        "open_issues_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "subscribers_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "network_count": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "permissions": {
+          "$ref": "#/definitions/Permission"
+        },
+        "pushed_at": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "Leaf": {
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "size": {
+          "type": "number",
+          "format": "double"
+        },
+        "sha": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "TreePost": {
+      "properties": {
+        "tree": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Leaf"
+          }
+        },
+        "base_tree": {
+          "type": "string",
+          "description": "The SHA1 of the tree you want to update with new data. If you don't set this, the commit will be created on top of everything; however, it will only contain your change, the rest of your files will show up as deleted."
+        }
+      },
+      "type": "object"
+    },
+    "Tree": {
+      "properties": {
+        "sha": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "tree": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Leaf"
+          }
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "Tag": {
+      "properties": {
+        "tag": {
+          "type": "string"
+        },
+        "sha": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "tagger": {
+          "$ref": "#/definitions/Author"
+        },
+        "object": {
+          "$ref": "#/definitions/ReferencedObject"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ReferencePatch": {
+      "properties": {
+        "sha": {
+          "type": "string"
+        },
+        "force": {
+          "type": "boolean",
+          "description": "Indicates whether to force the update or to make sure the update is a fast-forward update. Leaving this out or setting it to false will make sure you're not overwriting work. Default: false"
+        }
+      },
+      "type": "object"
+    },
+    "ReferencePost": {
+      "properties": {
+        "ref": {
+          "type": "string",
+          "description": "The name of the fully qualified reference (ie: refs/heads/master). If it doesn't start with 'refs' and have at least two slashes, it will be rejected."
+        },
+        "sha": {
+          "type": "string",
+          "description": "The SHA1 value to set this reference to"
+        }
+      },
+      "type": "object"
+    },
+    "ReferencedObject": {
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "sha": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Reference": {
+      "properties": {
+        "ref": {
+          "type": "string",
+          "description": "The name of the fully qualified reference (ie: refs/heads/master). If it doesn't start with 'refs' and have at least two slashes, it will be rejected."
+        },
+        "url": {
+          "type": "string"
+        },
+        "object": {
+          "$ref": "#/definitions/ReferencedObject"
+        }
+      },
+      "type": "object"
+    },
+    "Author": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Committer": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Commit": {
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "The commit message"
+        },
+        "tree": {
+          "type": "string",
+          "description": "The SHA of the tree object this commit points to"
+        },
+        "parents": {
+          "type": "array",
+          "description": "The SHAs of the commits that were the parents of this commit. If omitted or empty, the commit will be written as a root commit. For a single parent, an array of one SHA should be provided; for a merge commit, an array of more than one should be provided.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "author": {
+          "$ref": "#/definitions/Author"
+        },
+        "committer": {
+          "$ref": "#/definitions/Committer"
+        }
+      },
+      "type": "object"
+    },
+    "Blob": {
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "encoding": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "sha": {
+          "type": "string"
+        },
+        "size": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "type": "object"
+    }
+  }
+}
