@@ -1,0 +1,15 @@
+build notes
+
+install/config these:
+
+7z
+VirtualBox
+Node
+Powershell Server
+Eclipse
+PuTTy
+Tomcat
+PHP
+Python
+VSCode
+Remote Desktop

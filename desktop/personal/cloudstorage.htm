@@ -1,0 +1,2049 @@
+<page 
+	title='Getting Started with Cloud Storage Integrator'
+	keywords='cloud, storage, amazon, google, microsoft, s3, drive, onedrive, box, box.com, dropbox'
+	description='An introduction to file management with Cloud Storage Integrator'
+	pubdate='04/04/2016'
+>
+	
+	<p>
+	
+	Requirements: <a href="http://www.nsoftware.com/ibiz/cloudstorage/">Cloud Storage Integrator</a>		<br />
+	</p>
+	
+	<h2>Introduction</h2>
+	
+	<p>
+Cloud Storage Integrator provides easy-to-use components for accessing cloud storage services including Amazon S3, Google Drive, Dropbox, Box.com, OneDrive, Wasabi, and more.
+<p>
+The toolkit consists of components for each individual service, and a <var>CloudStorage</var> component with a unified API for accessing multiple services.
+<p>
+Cloud Storage Integrator also provides strong encryption support to protect data being stored in the cloud.
+<p>
+</p>
+    <h2>
+        Contents</h2>
+    <ul>
+        <li><a href="#glacier">Amazon Glacier</a></li>
+    		<li><a href="#amazons3">Amazon S3</a></li>
+        <li><a href="#azureblob">Azure Blob</a></li>
+        <li><a href="#box">Box.com</a></li>
+        <li><a href="#cloudstorage">CloudStorage</a></li>
+        <li><a href="#dropbox">Dropbox</a></li>
+        <li><a href="#googledrive">Google Drive</a></li>
+        <li><a href="#onedrive">OneDrive</a></li>
+        <li><a href="#sponline">SharePoint Online</a></li>
+        <li><a href="#wasabi">Wasabi</a></li>
+    </ul>
+    <p>
+<h2 class="padding-submenu" id="glacier">Amazon Glacier</h2>
+<p>
+The AmazonGlacier component allows easy access to Glacier's services to create, store and manage vaults and archives.
+Capabilities include managing jobs, managing archives, managing vaults, and strong encryption support.
+</p>
+<p>
+To begin, first create an Amazon AWS account and sign up for the Glacier service.  Consult the Amazon Glacier documentation for 
+instructions on this process.
+</p>
+<h3>Authentication</h3>
+<p>
+Authentication is performed using the <var>AccessKey</var> and <var>SecretKey</var> provided by Amazon Glacier.
+</p>
+<p><b>Setting Access and Secret Keys Example</b></p>
+<code lang='csharp'>
+glacier = new Glacier();
+glacier.AccessKey = GLACIER_ACCESS_KEY;
+glacier.SecretKey = GLACIER_SECRET_KEY;
+</code>
+<h3>Managing Vaults</h3>
+<p>
+The AmazonGlacier component will allow the creation, deletion, and listing of all the vaults for the user. 
+</p>
+<p>
+The <var>ListVaults</var> method will return all the vaults for a provided account. By default it can return up to 1000 vaults but
+can be adjusting by setting the <var>MaxListVaultResults</var> parameter.  If the number of results exceeds the maximum the results are paged. 
+The <var>IsVaultPaged</var> setting will be set to True and <var>VaultMarker</var> will be populated. 
+To get all results simply call <var>ListVaults</var> again until <var>IsVaultPaged</var> returns False and <var>VaultMarker</var> is empty string.
+</p>
+<p>
+The <var>GetVaultInfo</var> method will acquire the information for a single vault specified by the <i>VaultName</i>. 
+</p>
+<p>
+Both of these calls will populate the following fields:
+<ul>
+<li><var>ArchiveCount</var></li>
+<li><var>Arn</var></li>
+<li><var>CreationDate</var></li>
+<li><var>LastInventoryDate</var></li>
+<li><var>Name</var></li>
+<li><var>Size</var></li>
+</ul></p>
+<p><b>Listing Vaults Example</b></p>
+<code lang='csharp'>
+glacier.ListVaults();
+for(int i = 0; i < glacier.Vaults.Count; i++)
+	{
+		Console.WriteLine(glacier.Vaults[i].Name);
+		Console.WriteLine(glacier.Vaults[i].CreationDate);
+		Console.WriteLine(glacier.Vaults[i].LastInventoryDate);
+		Console.WriteLine(glacier.Vaults[i].ArchiveCount);
+    }
+</code>
+<p>
+The AmazonGlacier component will allow for deletion of vaults by calling the <var>DeleteVault</var> method and  allow the creation a new vault by 
+calling the <var>CreateVault</var> method.
+</p>
+<h3>Managing Jobs</h3>
+<p>
+The <var>ListJobs</var> method will list all the jobs for a specific vault. The <var>JobList</var> event will fire once for each Job returned. 
+In addition, the Jobs collection will be populated. By default, up to 1000 jobs will be returned in a single set of results. 
+The maximum number of results can be specified by setting <var>MaxListJobResults</var>.  If the number of results exceeds the maximum the results are paged. 
+The <var>IsJobPaged</var> setting will be set to True and <var>JobMarker</var> will be populated. To get all results simply call <var>ListJobs</var> again 
+until <var>IsJobPaged</var> returns False and <var>JobMarker</var> is empty string.
+</p>
+The <var>GetJobInfo</var> method will acquire the information for a single job specified by the <i>JobId</i>. 
+</p>
+<p>
+Both of these calls will populate the following fields:
+<ul>
+<li><var>JobType</var></li>
+<li><var>ArchiveId</var></li>
+<li><var>ArchiveSize</var></li>
+<li><var>ArchiveSHA256TreeHash</var></li>
+<li><var>Completed</var></li>
+<li><var>CompletionDate</var></li>
+<li><var>Description</var></li>
+<li><var>JobId</var></li>
+<li><var>SNSTopic</var></li>
+<li><var>SHA256TreeHash</var></li>
+<li><var>StatusCode</var></li>
+<li><var>StatusMessage</var></li>
+<li><var>VaultArn</var></li>
+<li><var>InventorySize</var></li>
+</ul></p>
+<p><b>Listing Jobs Example</b></p>
+<code lang='csharp'>
+glacier.ListJobs(TEST_VAULT_NAME);
+for(int i = 0; i < glacier.Jobs.Count; i++)
+{
+		Console.WriteLine(glacier.Jobs[i].JobId);
+		Console.WriteLine(glacier.Jobs[i].Type);
+		Console.WriteLine(glacier.Jobs[i].SNSTopic);
+		Console.WriteLine(glacier.Jobs[i].StatusMessage);   
+}
+</code>
+<p>
+The AmazonGlacier component will allow for the deletion of jobs by calling the <var>DeleteJob</var> method 
+and will allow the creation of a new job by calling the <var>CreateJob</var> method. 
+</p>
+
+<h3>Uploading Archives</h3>
+<p>
+The <var>UploadArchive</var> method uploads an archive to the vault specified by <i>VaultName</i>. The data will be read
+from the specified source set. There are three options to set the data source.
+<ul>
+<li><var>SetUploadStream</var> is used to specify a valid stream.</li>
+<li><var>LocalFile</var> is used to specify a file.</li> 
+<li><var>ArchiveData</var> is used specify data as a string or byte array.</li>
+</ul>
+This method returns the <i>ArchiveId</i> if the data was successfully uploaded. 
+</p>
+<b>Upload Archive Example</b>
+<p></p>
+<code lang='csharp'>
+//Setting ArchiveData
+glacier.ArchiveData = "Test Archive";
+String id = glacier.UploadArchive(TEST_VAULT_NAME_ARCHIVE, "It is a Test Archive");
+
+//Setting LocalFile
+glacier.LocalFile = myFile;
+String id = glacier.UploadArchive(TEST_VAULT_NAME_ARCHIVE, "It is a Test Archive");
+</code>
+<h3>Uploading Parts</h3>
+<p>
+The <var>StartMultipartUpload</var> method initiates a multipart upload operation. Multipart uploads are beneficial in 
+situations where you wish to upload a large amount of data, or do not know how large the data will be when you begin 
+uploading.
+</p>
+<p>
+This method returns an <i>UploadId</i> that must be saved. This will be used to perform other operations with this upload.
+</p>
+<p>
+Parts may be uploaded in parallel by using separate component instances. When uploading a part with <var>UploadPart</var> a part 
+number is specified so the data can be properly re-assembled in order when it reaches the server.
+</p>
+<p>
+After all parts are uploaded call <var>CompleteMultipartUpload</var> to complete the operation. If parts of the archive were uploaded 
+using separate instances of the component, you must first list all parts of the archive by calling <var>ListParts</var> until 
+<var>PartMarker</var> is empty (all parts are returned).
+</p>
+<p>
+To cancel the multi-part upload, call the <var>AbortMultipartUpload</var> method.
+</p>
+<p><b>Multipart Upload Example</b></p>
+<code lang='csharp'>
+String multiUploadId = glacier.StartMultipartUpload(TEST_VAULT_NAME_ARCHIVE, "Multipart Upload");
+for (int i = 0; i < 5; i++)
+{
+  String fileName = "../part" + i;
+  glacier.LocalFile = fileName;
+  glacier.UploadPart(TEST_VAULT_NAME_ARCHIVE, mulUploadId, i);
+}
+String archiveId = glacier.CompleteMultipartUpload(TEST_VAULT_NAME_ARCHIVE, mulUploadId);
+</code>
+<h3>Additional Functionality</h3>
+<p>
+The AmazonGlacier component offers additional functionality including:
+<ul>
+<li>Encrypt and decrypt files using <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var>.
+<li>Notification management via <var>GetNotificationInfo</var>
+<li>And more!
+</ul>
+</p>
+
+
+<h2 class="padding-submenu" id="amazons3">Amazon S3</h2>
+<p>
+The S3 Component allows easy access to Amazon's Simple Storage Service (S3) to manage the S3 resources.
+Capabilities include managing buckets, managing objects, and strong encryption support.
+</p>
+<p>
+To begin, first create an Amazon S3 account service.  Consult the Amazon S3 documentation for 
+instructions on this process.
+</p>
+<h3>Authentication</h3>
+<p>
+Authentication is performed using the <var>AccessKey</var> and <var>SecretKey</var> provided by Amazon. 
+</p>
+<p><b>Setting Access and Secret Keys Example</b></p>
+<code lang='csharp'>
+s3 = new S3();
+s3.AccessKey = S3_ACCESS_KEY;
+s3.SecretKey = S3_SECRET_KEY;
+</code>
+<h3>Managing Buckets</h3>
+<p>
+The <var>ListBuckets</var> method will return all the buckets for a provided account. 
+When called the following fields will be populated:
+<ul>
+<li><var>BucketName</var></li>
+<li><var>CreationDate</var></li>
+<li><var>OwnerId</var></li>
+<li><var>OwnerName</var></li>
+<li><var>OtherData</var></li>
+</ul>
+</p>
+<p><b>List Buckets Example</b></p>
+<code lang='csharp'>
+s3.ListBuckets();
+for(int i = 0; i < s3.Buckets.Count; i++)
+{
+  Console.WriteLine(s3.Buckets[i].Name);
+  Console.WriteLine(s3.Buckets[i].CreationDate);
+  Console.WriteLine(s3.Buckets[i].OwnerDisplayName);
+}
+</code>
+<p>
+The S3 component allows for deletion of buckets by calling the <var>DeleteBucket</var> method and allows 
+for the creation of a new bucket by calling the <var>CreateBucket</var> method.
+</p>
+<p>
+Other features for managing buckets include:
+</p>
+<p><ul>
+<li><var>UpdateBucketACL</var> will update the access policy of the bucket.</li>
+<li><var>GetBucketLocation</var> will return the location value of the bucket.</li>
+</ul></p>
+<h3>Managing Objects</h3>
+<p>
+The <var>ListObjects</var> method will return all the objects within a given bucket. The bucket specified is 
+set by the <var>Bucket</var> property. <var>ObjectPrefix</var>, <var>ObjectDelimiter</var>, and <var>ObjectMarker</var> 
+can be used to filter or control the objects listed from the <var>ListObjects</var> method.
+</p>
+<p>
+When called the following fields will be populated:
+<ul>
+<li><var>ObjectName</var></li>
+<li><var>ObjectModifiedDate</var></li>
+<li><var>ObjectSize</var></li>
+<li><var>ETag</var></li>
+<li><var>OwnerId</var></li>
+<li><var>OwnerName</var></li>
+<li><var>UploadId</var></li>
+<li><var>OtherData</var></li>
+</ul>
+</p>
+<p><b>List Objects Example</b></p>
+<code lang='csharp'>
+s3.Bucket = "TEST_BUCKET";
+
+//set prefix
+s3.ObjectPrefix = "photos/2016/";
+
+s3.ListObjects();
+for(int i = 0; i < s3.Objects.Count; i++)
+	{
+		Console.WriteLine(s3.Objects[i].Name);
+        Console.WriteLine(s3.Objects[i].LastModified);
+        Console.WriteLine(s3.Objects[i].Size);
+	}
+</code>
+<p>
+The S3 component allows for deletion of objects by calling the <var>DeleteObject</var> method 
+and allows for the creation of a new object by calling the <var>CreateObject</var>. 
+</p>
+<p>
+In order to retrieve a desired object, call <var>GetObject</var>. This will store the object in the file specified
+by the <var>LocalFile</var> property. A bucket name must also be set using the <var>Bucket</var> property. 
+</p>
+<p><b>Get Object Example</b></p>
+<code lang='csharp'>
+s3.Bucket = "TEST_BUCKET";
+s3.LocalFile = "C:\\testFile.txt";
+s3.GetObject("testObject");
+</code>
+<p>
+Other features for managing objects include:
+<ul>
+<li><var>UpdateObjectACL</var> updates the access policy of an object.</li>
+<li><var>GetTorrent</var> retrieves an object from a bucket as a torrent.</li>
+<li><var>GetObjectInfo</var> stores the meta-data in the <var>ParsedHeaders</var> property.</li> 
+<li><var>AddUserMetaData</var> allows for custom meta data to be associated with an object. Before calling 
+<var>CreateObject</var> use the <var>AddUserMetaData</var> to add up to 2K of user meta data.</li>
+<li><var>GetLink</var> creates an authenticated link to allow access to objects.</li>
+</ul>
+</p>
+<h3>Managing Uploads</h3>
+<p>
+<var>StartMultiPartUpload</var> begins a multipart upload. This method will initiate a multipart upload and return 
+the <i>UploadId</i> associated with the upload. There is no expiration of the upload. The upload must be completed by 
+calling <var>CompleteMultipartUpload</var> or aborted by calling <var>AbortMultipartUpload</var>.
+</p>
+<p>
+The <i>UploadId</i> returned by this method is used to reference the upload when uploading parts via <var>UploadPart</var> 
+and other methods such as <var>AbortMultipartUpload</var>, <var>CompleteMultipartUpload</var>, and <var>ListParts</var>.
+</p>
+<p><b>MultiPartUpload Example</b></p> 
+<code lang='csharp'>
+//start to upload parts
+s3.Bucket = "TEST_BUCKET";
+String uploadId = s3.StartMultipartUpload("test_file.dat");
+
+//list the current multipart uploads
+s3.ListMultipartUploads();
+for(int i = 0; i < s3.Objects.Count; i++)
+{
+  Console.WriteLine(s3.Objects[i].Name);
+  Console.WriteLine(s3.Objects[i].UploadId);
+  Console.WriteLine(s3.Objects[i].Size);
+}
+s3.CompleteMultipartUpload("test_file.dat", uploadId);
+</code>
+<p>
+The <var>ListParts</var> method lists all the parts in a current multipart upload. The <var>PartList</var> event will 
+be fire once for each part in the current upload as reported by the server. The <var>Parts</var> collection will also be populated. 
+Parts may be inspected to determine various information such as <i>ETag</i>, <i>PartNumber</i>, <i>ObjectName</i>, etc.
+</p>
+<p>
+By default, only the first 1000 parts will be returned. To determine if the results are paged check <var>IsPaged</var>. 
+If the results are paged continue to call <var>ListParts</var> to obtain the next set of parts until <var>IsPaged</var> returns false. 
+The <var>Parts</var> collection will then contain all of the parts for the upload. To change the default maximum number 
+of parts to be returned set <var>MaxParts</var>. 
+</p>
+<p><b>UploadPart Example</b></p>
+<code lang='csharp'>
+s3.Bucket = "TEST_BUCKET";
+String uploadId = s3.StartMultipartUpload("test_file.dat");
+
+//upload parts 
+s3.UploadPart("test_file.dat", 1, uploadId);
+s3.UploadPart("test_file.dat", 2, uploadId);
+
+//list all the parts 
+s3.ListParts("test_file.dat", uploadId);
+for (int i = 0; i < s3.Parts.Count; i++)
+{
+  Console.WriteLine(s3.Parts[i].ObjectName);
+  Console.WriteLine(s3.Parts[i].PartNumber);
+  Console.WriteLine(s3.Parts[i].Size);
+}
+String uploadId = s3.StartMultipartUpload("test_file.dat");
+</code>
+<h3>Additional Functionality</h3>
+<p>
+The S3 component offers advanced functionality. For instance:
+<ul>
+<li>Encrypt and decrypt files using <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var>.</li>
+<li>Manage bucket and object ACLs with <var>UpdateBucketACL</var> and <var>UpdateObjectACL</var>.</li>
+<li>Use <var>CopyObject</var> to copy objects on the server.</li>
+<li>And more!</li>
+</ul>
+</p>
+
+
+<h2 class="padding-submenu" id="azureblob">Azure Blob</h2>
+<p>
+The Blob component provides an easy to use interface to Microsoft's Azure Blob Service, which allows you to store text and binary data. 
+The Blob service offers the following three resources: the storage account, containers, and blobs. Within your storage account, containers provide a way to organize sets of blobs.
+<p>
+The Blob component allows you to create, manage, and delete Block blobs. Block blobs are optimized for streaming, and provide a way to store large sets of data (such as files).
+<p>
+To begin, first sign up for the Azure Blob Service. Consult the Microsoft Azure documentation for instructions on this process.
+<p>
+<h3>Authentication</h3>
+<p>
+Authentication is performed using the <var>Account</var> and <var>AccessKey</var> provided by Microsoft Azure.
+<p><b>Setting Account and Access Key Example</b></p>
+<code lang="csharp">
+blob = new Azureblob();
+blob.Account = BLOB_ACCOUNT;
+blob.AccessKey = BLOB_ACCESS_KEY;
+</code>
+<p>
+<h3>Managing Containers</h3>
+<p>
+The <var>ListContainers</var> method will return all the containers for the provided account.
+<var>Prefix</var> can be used to filter the containers listed by this method.
+<p>
+If there are more than <var>MaxResults</var> results, <var>Marker</var> will be populated with 
+the marker identifying the position in the results. Subsequent <var>ListContainers</var> calls will return 
+the next portion of results. If <var>Marker</var> is an empty string, the end of the list has been reached.
+<p>
+When called the following fields will be populated:
+<ul>
+<li><var>Name</var>
+<li><var>ETag</var>
+<li><var>LastModified</var>
+<li><var>URL</var>
+</ul>
+<p>
+<p><b>List Containers Example</b></p>
+<code lang="csharp">
+blob.ListContainers();
+for (int i = 0; i < blob.Containers.Count; i++) {
+  Console.WriteLine(blob.Containers[i].Name);
+  Console.WriteLine(blob.Containers[i].LastModified);
+  Console.WriteLine(blob.Containers[i].URL);
+}
+</code>
+<p>
+The Blob component allows for deletion of containers by calling the <var>DeleteContainer</var> method, 
+and allows for the creation of a new container by calling the <var>CreateContainer</var> method.
+<p>
+Other features for managing containers include:
+<ul>
+<li><var>GetContainerACL</var>/<var>SetContainerACL</var> for working with container access policies</li>
+<li><var>GetContainerMetadata</var>/<var>SetContainerMetadata</var> for working with container metadata</li>
+</ul>
+<p>
+<h3>Managing Blobs</h3>
+<p>
+The <var>ListBlobs</var> method will list the blobs within the container specified by <var>ContainerName</var>.
+<var>Prefix</var> and <var>BlobDelimiter</var> can be used to filter the blobs listed by this method.
+<p>
+If there are more than <var>MaxResults</var> results, <var>Marker</var> will be populated with 
+the marker identifying the position in the results. Subsequent <var>ListBlobs</var> calls will return 
+the next portion of results. If <var>Marker</var> is an empty string, the end of the list has been reached.
+<p>
+When called the following fields will be populated:
+<ul>
+<li><var>Name</var>
+<li><var>ETag</var>
+<li><var>LastModified</var>
+<li><var>URL</var>
+<li><var>BlobType</var>
+<li><var>LeaseStatus</var>
+<li><var>CacheControl</var>
+<li><var>ContentEncoding</var>
+<li><var>ContentLanguage</var>
+<li><var>ContentLength</var>
+<li><var>ContentMD5</var>
+</ul>
+<p>
+<p><b>List Blobs Example</b></p>
+<code lang="csharp">
+blob.ContainerName = "TEST_CONTAINER";
+blob.ListBlobs();
+for (int i = 0; i < blob.Blobs.Count; i++) {
+  Console.WriteLine(blob.Blobs[i].Name);
+  Console.WriteLine(blob.Blobs[i].LastModified);
+  Console.WriteLine(blob.Blobs[i].ContentLength);
+}
+</code>
+<p>
+The Blob component allows for deletion of blobs by calling the <var>DeleteBlob</var> method, 
+and allows for the creation of a new blob by calling the <var>CreateBlob</var> method.
+<p>
+In order to retrieve a desired blob, call <var>GetBlob</var>. This will store the blob in the file specified by
+<var>LocalFile</var>, unless it is set to an empty string, in which case it will be stored in <var>BlobData</var>.
+<p>
+Other features for managing containers include:
+<ul>
+<li><var>CopyBlob</var> to copy a source blob to a destination blob within the storage account</li>
+<li><var>GetBlobMetadata</var>/<var>SetBlobMetadata</var> for working with blob metadata</li>
+<li><var>LeaseBlob</var> for working with blob leases</li>
+</ul>
+<p>
+<h3>Managing Blocks</h3>
+<p>
+The <var>ListBlocks</var> method will list the blocks that have been uploaded as part of the blob specified by the <var>blobName</var> parameter.
+<var>Prefix</var> and <var>BlobDelimiter</var> can be used to filter the blobs listed by this method.
+<p>
+There are two types of block lists maintained for a blob, Committed and Uncommitted. 
+The committed block list contains a list of blocks that have been successfully 
+committed using the <var>PutBlockList</var> method. The uncommitted block list contains a list of 
+blocks that have been uploaded, using the <var>CreateBlock</var> method, but have not been committed.
+<p>
+The <var>blockListType</var> parameter allows you to specify which of these lists should be returned.
+The possible values are:
+<ul>
+<li>0 - Only the committed block list is retrieved
+<li>1 - Only the uncommitted block list is retrieved
+<li>2 - Both the committed and the uncommitted block lists are retrieved
+</ul>
+<p>
+When called the following fields will be populated:
+<ul>
+<li><var>BlockType</var>
+<li><var>Id</var>
+<li><var>Size</var>
+</ul>
+<p>
+<p><b>List Blocks Example</b></p>
+<code lang="csharp">
+blob.ListBlocks("BLOB_NAME", 2);
+for (int i = 0; i < blob.Blobs.Count; i++) {
+  Console.WriteLine(blob.Blobs[i].BlockType);
+  Console.WriteLine(blob.Blobs[i].Id);
+  Console.WriteLine(blob.Blobs[i].Size);
+}
+</code>
+<p>
+The Blob component allows for the creation of a new block by calling the <var>CreateBlock</var> method.
+The <var>AddBlock</var> method is used to add a block to the list of blocks that will be committed to form a blob.
+The <var>PutBlockList</var> method is used to commit the current block list in order to create/update a blob.
+<p>
+</ul>
+<p>
+<h3>Additional Functionality</h3>
+<p>
+The Blob component offers additional functionality, such as:
+<ul>
+<li><var>GetLink</var> to create a link to access a blob
+<li><var>CreateSnapshot</var> to create snapshots of blobs
+<li>And more!
+</ul>
+<p>
+
+
+<h2 class="padding-submenu" id="box">Box.com</h2>
+<p>
+The Box component provide an easy way to upload, download, and manage files and folders with Box.com.
+
+<rem>
+The Box component provides a simple interface to work with Box.com. Capabilities 
+include uploading and downloading files, strong encryption support, creating folders, moving and copying resource, and more. 
+<p>
+To begin, first create an account and register your application with Box.com. Consult the Box.com documentation
+for instructions on this process.
+<p>
+<h3>Authentication</h3>
+<p>
+Authentication is performed via OAuth 2.0. Use the OAuth component included in the toolkit, or any other OAuth 
+implementation to perform authentication and retrieve an authorization string. Once you've obtained an 
+authorization string like:
+<p>
+<var>
+Bearer ya29.AHES6ZSZEJzATdZYjeihDn5W-VrXSsxEZu5p0pclxGdKKQ
+</var>
+</p>
+<p>
+Assign this value to the Authorization property before attempting any operations. 
+Consult the Box.com documentation for this particular service for more information about supported scope values and 
+more details on OAuth authentication. 
+<p>
+<b>OAuth Example</b>
+</p>
+<code lang='csharp'>
+oauth.ClientProfile = OauthClientProfiles.cfApplication;
+oauth.ClientId = OAUTH_CLIENT_ID;
+oauth.ClientSecret = OAUTH_SECRET_ID;
+oauth.RefreshToken = refreshToken;
+
+oauth.ServerAuthURL = "https://app.box.com/api/oauth2/authorize";
+oauth.ServerTokenURL = "https://api.box.com/oauth2/token";
+oauth.AuthorizationScope = "";
+
+oauth.Config("WebServerPort=7777"); // http://localhost:7777 is a registered redirect_uri for the app
+
+string authString = oauth.GetAuthorization();
+
+box.Authorization = authString;
+</code>
+<p>
+<h3>Listing Resources</h3>
+<p>
+<var>ListResources</var> lists resources within the account at the specified path.
+<p>
+<var>ListResources</var> lists resources in the folder specified by <var>ResourceParentId</var>. If <var>ResourceParentId</var>
+is unspecified the root folder contents will be listed.
+<p>
+After calling this method set <var>ResourceIndex</var> to a value from 0 to <var>ResourceCount</var> - 1.
+Setting <var>ResourceIndex</var> populates other Resource properties to provide information about the resource.
+<p>
+After calling this method the following resource properties are populated:
+<ul>
+<li><var>ResourceDeleted</var>
+<li><var>ResourceETag</var>
+<li><var>ResourceHash</var> (not applicable to folders)
+<li><var>ResourceId</var>
+<li><var>ResourceMarker</var>
+<li><var>ResourceName</var>
+<li><var>ResourceRevision</var>
+<li><var>ResourceType</var>
+</ul>
+
+<p>
+If the results are paged, the <var>ResourceMarker</var> property will be populated. Call this method again 
+to retrieve the next page of results. When the last page of results is returned <var>ResourceMarker</var> will be empty.
+<p>
+Note: To define a specific list of fields which are returned in the response for each resource set the "fields" parameter via <var>AddQueryParam</var>. 
+Refer to the Box documentation for a full list of available fields.
+</p>
+<code lang='csharp'>
+box.ResourceParentId = "123456";
+box.ListResources();
+for (int i = 0; i < box.ResourceCount; i++)
+{
+  box.ResourceIndex = i;
+  Console.WriteLine(box.ResourceName);
+}
+</code>
+<p>
+<h3>Downloading Files</h3>
+<p>
+The <var>DownloadFile</var> method downloads a specific file. 
+<p>
+<var>DownloadFile</var> downloads the file specified by <var>ResourceId</var>.
+Set <var>ResourceId</var> to the Id of the file to download before calling this method.
+The file will be downloaded to the stream specified (if any) by <var>SetDownloadStream</var>.
+If a stream is not specified and <var>LocalFile</var> is set the file will be saved to the specified location.
+If a stream is not specified and <var>LocalFile</var> is not set the file data will be held by <var>ResourceData</var>.
+<p>
+To decrypt an encrypted file set <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var> before calling this method.
+</p>
+<code lang='csharp'>
+box.ResourceId = "50619395801"
+box.LocalFile = "../MyFile.zip";
+box.DownloadFile();
+</code>
+<p>
+<b>Resuming Downloads</b>
+<p>
+The component also supports resuming failed downloads by using the <var>StartByte</var> property. If the download was interrupted, set
+<var>StartByte</var> to the appropriate offset before calling this method to resume the download.
+</p>
+<code lang='csharp'>
+box.ResourceId = myId;
+box.LocalFile = downloadFile;
+box.DownloadFile();
+
+//The transfer is interrupted and DownloadFile() above fails. Later, resume the download:
+
+//Get the size of the partially download file
+box.StartByte = new FileInfo(downloadFile).Length; 
+box.ResourceId = myId;
+box.LocalFile = downloadFile;
+box.DownloadFile();
+</code>
+<p>
+<b>Resuming Encrypted File Downloads</b>
+<p>
+Resuming encrypted file downloads is only supported when <var>LocalFile</var> was set in the initial download attempt. 
+When beginning an encrypted download
+if <var>LocalFile</var> is set the component will create a temporary file in <var>TempPath</var> to hold the encrypted data until it is 
+complete.
+<p>
+If the download is interrupted <var>DownloadTempFile</var> will be populated with the temporary file holding the partial data.
+When resuming, <var>DownloadTempFile</var> must be populated along with <var>StartByte</var> to allow the remainder of the encrypted data 
+to be downloaded. Once the encrypted data is downloaded it will be decrypted and written to <var>LocalFile</var>.
+</p>
+<code lang='csharp'>
+box.ResourceId = myId;
+box.LocalFile = downloadFile;
+box.EncryptionPassword = "password";
+box.DownloadFile();
+
+//The transfer is interrupted and DownloadFile() above fails. Later, resume the download:
+
+//Get the size of the partially download temp file
+box.StartByte = new FileInfo(box.Config("DownloadTempFile")).Length; 
+box.ResourceId = myId;
+box.LocalFile = downloadFile;
+box.EncryptionPassword = "password";
+box.DownloadFile();
+</code>
+<p>
+<h3>Uploading Files</h3>
+<p>
+<var>UploadFile</var> uploads a file to the folder specified by <var>ResourceParentId</var>. If <var>ResourceParentId</var> is not
+specified the file will be uploaded to the root directory. This method returned the Id of the uploaded file.
+If the file already exists, the server will return an error.
+<p>
+The <i>FileName</i> parameter specifies the name of the file. 
+Naming restrictions:
+<ul>
+<li>Names must be 255 characters or less. 
+<li>Names with non-printable ASCII are not supported. 
+<li>Names with the characters "/", "\", or trailing whitespace are not supported.
+<li>The special names "." and ".." are not supported.
+</ul>
+<p>
+<var>LocalFile</var> specifies the file to upload. The data to upload may also be set in <var>ResourceData</var> or 
+set by <var>SetUploadStream</var>. To encrypt a file set <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var>.
+<p>
+The following properties are applicable when calling <var>UploadFile</var>:
+<ul>
+<li><var>LocalFile</var>
+<li><var>ResourceData</var>
+<li><var>ResourceParentId</var>
+<li><var>EncryptionAlgorithm</var>
+<li><var>EncryptionPassword</var>
+</ul>
+</p>
+<code lang='csharp'>
+box.LocalFile = "../MyFile.zip";
+box.UploadFile("MyFile.zip");
+</code>
+<p>
+After uploading a file the <b>Resource*</b> properties are populated with information about the uploaded file.
+<p>
+<h3>Additional Functionality</h3>
+<p>
+The Box component offers advanced functionality beyond simple uploads and downloads. For instance:
+<ul>
+<li>Encrypt and decrypt files using <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var>.
+<li><var>CreateMetadata</var>, <var>UpdateMetadata</var>, and <var>DeleteMetadata</var> allow creation and management of resource metadata.
+<li><var>ShareResource</var> creates shareable links to content.
+<li><var>Search</var> can be used to search for matching content.
+<li>Revisions are supported through <var>ListRevisions</var> and <var>PromoteRevision</var>.
+<li>Undelete files with <var>ListDeletedResources</var>, and <var>RestoreResource</var>.
+<li><var>GetAccountInfo</var> provides usage and account information.
+<li><var>GetPreviewLink</var> and <var>GetThumbnail</var> retrieve preview information for files.
+<li>And more!
+</ul>
+
+<h2 class="padding-submenu" id="cloudstorage">CloudStorage</h2>
+<p>
+The CloudStorage component provides a single interface that can be used to work with a variety of services.
+By supporting multiple providers with a single API code may be written once and used to support multiple services. 
+The following providers are currently supported by this component:
+<ul>
+<li>Amazon S3
+<li>Azure Blob
+<li>Box.com
+<li>DropBox
+<li>Google Drive
+<li>Microsoft OneDrive
+<li>SharePoint Online
+<li>Wasabi
+</ul>
+<p>
+The component supports simple file and folder management as well as encryption. Capabilities 
+include uploading and downloading files, strong encryption support, creating folders, and more. 
+<p>
+To begin, first create an account and register your application. Consult the documentation of the individual service provider
+for instructions on this process.
+<p>
+<h3>Authentication</h3>
+<p>
+The following providers use OAuth 2.0 for authentication:
+<ul>
+<li>Box
+<li>DropBox
+<li>Google Drive
+<li>Microsoft OneDrive
+</ul>
+<p>
+Use the OAuth component included in the toolkit, or any other OAuth 
+implementation to perform authentication and retrieve an authorization string. Once you've obtained an 
+authorization string like:
+</p><p></p>
+<code lang='csharp'>
+Bearer ya29.AHES6ZSZEJzATdZYjeihDn5W-VrXSsxEZu5p0pclxGdKKQ
+</code>
+<p>
+Assign this value to the Authorization property before attempting any operations. 
+Consult the Box.com documentation for this particular service for more information about supported scope values and 
+more details on OAuth authentication. 
+<p>
+The other providers use the <var>Account</var> type to provide their provider-specific credentials:
+<ul>
+<li>To authenticate with Amazon S3, set <var>Account.AmazonS3AccessKey</var> and <var>Account.AmazonS3SecretKey</var>
+<li>To authenticate with SharePoint Online, set <var>Account.SharePointURL</var>, <var>Account.SharePointUser</var>, and <var>Account.SharePointPassword</var>
+<li>To authenticate with Microsoft Azure Blob Service, set <var>Account.AzureBlobAccount</var> and <var>Account.AzureBlobAccessKey</var>
+<li>To authenticate with Wasabi, set <var>Account.WasabiAccessKey</var> and <var>Account.WasabiSecretKey</var>
+</ul>
+<p>
+<h3>Selecting a Provider</h3>
+<p>
+To specify the provider simply set <var>ServiceProvider</var>. This tells the component to which service requests will be made.
+<p>
+<h3>Listing Files and Folders</h3>
+<p>
+<var>ListDirectory</var> lists files and folder the path specified by <var>RemotePath</var>. A filemask may optionally be supplied in <var>RemoteFile</var>.
+<p>
+The directory entries are provided through the <var>DirList</var> event and also via the <var>DirList</var> property.
+</p>
+<code lang='csharp'>
+cloudstorage.RemotePath = "MyFolder";
+cloudstorage.ListDirectory();
+for (int i = 0; i < cloudstorage.DirList.Count; i++)
+{
+  Console.WriteLine(cloudstorage.DirList[i].FileName);
+  Console.WriteLine(cloudstorage.DirList[i].FileSize);
+  Console.WriteLine(cloudstorage.DirList[i].FileTime);
+  Console.WriteLine(cloudstorage.DirList[i].IsDir);
+}
+</code>
+<p>
+Optionally set <var>RemoteFile</var> to a filemask to list only specific files. For instance:
+</p>
+<code lang='csharp'>
+cloudstorage.RemoteFile = "*.txt";
+cloudstorage.ListDirectory();
+</code>
+<h3>Downloading Files</h3>
+<p>
+The <var>Download</var> method downloads a specific file. 
+<p>
+Set <var>RemoteFile</var> to the name the file to download before calling this method. 
+If <var>RemoteFile</var> only specifies a filename it will be downloaded from the path specified by <var>RemotePath</var>. <var>RemoteFile</var>
+may also be set to an absolute path.
+<p>
+The file will be downloaded to the stream specified (if any) by <var>SetDownloadStream</var>.
+If a stream is not specified and <var>LocalFile</var> is set the file will be saved to the specified location.
+If a stream is not specified and <var>LocalFile</var> is not set the file data will be held by <var>ResourceData</var>.
+<p>
+To decrypt an encrypted file set <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var> before calling this method.
+</p>
+<code lang='csharp'>
+cloudstorage.RemotePath = "My Folder";
+cloudstorage.RemoteFile = "MyFile.zip";
+cloudstorage.LocalFile = "../MyFile.zip";
+cloudstorage.Download();
+</code>
+<p>
+<b>Resuming Downloads</b>
+<p>
+The component also supports resuming failed downloads by using the <var>StartByte</var> property. If the download was interrupted, set
+<var>StartByte</var> to the appropriate offset before calling this method to resume the download.
+</p>
+<code lang='csharp'>
+cloudstorage.RemotePath = myRemoteFolder;
+cloudstorage.RemoteFile = myRemoteFile;
+cloudstorage.LocalFile = downloadFile;
+cloudstorage.Download();
+
+//The transfer is interrupted and Download() above fails. Later, resume the download:
+
+//Get the size of the partially download file
+cloudstorage.StartByte = new FileInfo(downloadFile).Length; 
+cloudstorage.RemotePath = myRemoteFolder;
+cloudstorage.RemoteFile = myRemoteFile;
+cloudstorage.LocalFile = downloadFile;
+cloudstorage.Download();
+</code>
+<p>
+<b>Resuming Encrypted File Downloads</b>
+<p>
+Resuming encrypted file downloads is only supported when <var>LocalFile</var> was set in the initial download attempt. 
+When beginning an encrypted download
+if <var>LocalFile</var> is set the component will create a temporary file in <var>TempPath</var> to hold the encrypted data until it is 
+complete.
+<p>
+If the download is interrupted <var>DownloadTempFile</var> will be populated with the temporary file holding the partial data.
+When resuming, <var>DownloadTempFile</var> must be populated along with <var>StartByte</var> to allow the remainder of the encrypted data 
+to be downloaded. Once the encrypted data is downloaded it will be decrypted and written to <var>LocalFile</var>.
+</p>
+<code lang='csharp'>
+cloudstorage.RemotePath = myRemoteFolder;
+cloudstorage.RemoteFile = myRemoteFile;
+cloudstorage.LocalFile = downloadFile;
+cloudstorage.EncryptionPassword = "password";
+cloudstorage.Download();
+
+//The transfer is interrupted and Download() above fails. Later, resume the download:
+
+//Get the size of the partially download temp file
+cloudstorage.StartByte = new FileInfo(cloudstorage.Config("DownloadTempFile")).Length; 
+cloudstorage.RemotePath = myRemoteFolder;
+cloudstorage.RemoteFile = myRemoteFile;
+cloudstorage.LocalFile = downloadFile;
+cloudstorage.EncryptionPassword = "password";
+cloudstorage.Download();
+</code>
+<p>
+<h3>Uploading Files</h3>
+<p>
+The <var>Upload</var> method is used to upload files.
+If <var>SetUploadStream</var> is used to set an upload stream the data to upload is taken from the stream instead.
+<p>
+<var>RemoteFile</var> should be set to either a relative or absolute path. If <var>RemoteFile</var> is not an absolute path it will 
+be uploaded relative to <var>RemotePath</var>. 
+<p>
+To encrypt a file before uploading set <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var>.
+<p>
+Note: Resuming uploads is not currently supported.
+<p>
+<b>Code Example:</b>
+</p>
+<code lang='csharp'>
+//Upload with a relative path
+cloudstorage.LocalFile = "C:\localfile.txt"
+cloudstorage.RemoteFile = "remotefile.txt"
+cloudstorage.Upload()
+
+//Upload with an absolute path
+cloudstorage.LocalFile = "C:\localfile2.txt"
+cloudstorage.RemoteFile = "/folder/remotefile2.txt"
+cloudstorage.Upload()
+</code>
+<p>
+<h3>Additional Functionality</h3>
+<p>
+The CloudStorage component offers advanced functionality beyond simple uploads and downloads. For instance:
+<ul>
+<li>Encrypt and decrypt files using <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var>.
+<li><var>DeleteFile</var> provides a way to delete files.
+<li><var>MakeDirectory</var> and <var>RemoveDirectory</var> support creating and deleting folders.
+<li><var>RenameFile</var> allows renaming of existing files on the server.
+<li>And more!
+</ul>
+
+<h2 class="padding-submenu" id="dropbox">Dropbox</h2>
+<p>
+The Dropbox component provides a simple interface to working with Dropbox. Capabilities 
+include uploading and downloading files, strong encryption support, creating folders, moving and copying resource, and more. 
+<p>
+To begin, first create an account and register your application with Dropbox. Consult the Dropbox documentation
+for instructions on this process.
+<p>
+<h3>Authentication</h3>
+<p>
+Authentication is performed via OAuth 2.0. Use the OAuth component included in the toolkit, or any other OAuth 
+implementation to perform authentication and retrieve an authorization string. Once you've obtained an 
+authorization string like:
+<p>
+<var>Bearer ya29.AHES6ZSZEJzATdZYjeihDn5W-VrXSsxEZu5p0pclxGdKKQ</var>
+<p>
+Assign this value to the Authorization property before attempting any operations. 
+Consult the Dropbox documentation for this particular service for more information about supported scope values and 
+more details on OAuth authentication.
+<p>
+<b>OAuth Example</b>
+</p>
+<code lang='csharp'>
+oauth.ClientProfile = OauthClientProfiles.cfApplication;
+oauth.ClientId = OAUTH_CLIENT_ID;
+oauth.ClientSecret = OAUTH_SECRET_ID;
+oauth.RefreshToken = refreshToken;
+ 
+oauth.ServerAuthURL = "https://www.dropbox.com/1/oauth2/authorize";
+oauth.ServerTokenURL = "https://api.dropboxapi.com/1/oauth2/token";
+oauth.AuthorizationScope = "";
+ 
+oauth.Config("WebServerPort=7777"); // http://localhost:7777 is a registered redirect_uri for the app
+ 
+string authString = oauth.GetAuthorization();
+ 
+dropbox.Authorization = authString;
+</code> 
+<p>
+<h3>Listing Resources</h3>
+<p>
+<var>ListResources</var> lists resources within the account at the specified path.
+<p>
+Before calling this method set <var>ResourcePath</var> to the full path to the folder to list. If
+<var>ResourcePath</var> is unspecified the root folder contents will be listed.
+<p>
+After calling this method set <var>ResourceIndex</var> to a value from 0 to <var>ResourceCount</var> - 1.
+Setting <var>ResourceIndex</var> populates other Resource properties to provide information about the resource.
+<p>
+After calling this method the following resource properties are populated:
+<ul>
+<li><var>ResourceCount</var>
+<li><var>ResourceId</var>
+<li><var>ResourceMarker</var>
+<li><var>ResourceModifiedDate</var>
+<li><var>ResourceName</var>
+<li><var>ResourcePath</var>
+<li><var>ResourceRevision</var>
+<li><var>ResourceType</var>
+</ul>
+<p>
+If the <var>ResourceType</var> is 1 (rtFolder) only the following properties are applicable:
+<ul>
+<li><var>ResourceCount</var>
+<li><var>ResourceId</var>
+<li><var>ResourceMarker</var>
+<li><var>ResourceName</var>
+<li><var>ResourcePath</var>
+<li><var>ResourceType</var>
+</ul>
+<p>
+If the results are paged, the <var>ResourceMarker</var> property will be populated. Call this method again 
+to retrieve the next page of results. When the last page of results is returned <var>ResourceMarker</var> will be empty.
+<p>
+By default, only resources of the specified <var>ResourcePath</var> are returned. To list files included within subfolders
+set <var>RecurseSubfolders</var> to True.
+</p>
+<code lang='csharp'>
+dropbox.ResourcePath = "/New Folder";
+dropbox.ListResources();
+for (int i = 0; i < dropbox.ResourceCount; i++)
+{
+  dropbox.ResourceIndex = i;
+  Console.WriteLine(dropbox.ResourceName + ": " + dropbox.ResourceSize);
+}
+</code>
+<p>
+<h3>Downloading Files</h3>
+<p>
+The <var>DownloadFile</var> method downloads a specific file. 
+<p>
+Set <var>ResourcePath</var> to the absolute path of the file to download before calling this method.
+The file will be downloaded to the stream specified (if any) by <var>SetDownloadStream</var>.
+If a stream is not specified and <var>LocalFile</var> is set the file will be saved to the specified location.
+If a stream is not specified and <var>LocalFile</var> is not set the file data will be held by <var>ResourceData</var>.
+<p>
+To decrypt an encrypted file set <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var> before calling this method.
+</p>
+<code lang='csharp'>
+dropbox.ResourcePath = "/My Folder/photos.zip"
+dropbox.LocalFile = "../MyFile.zip";
+dropbox.DownloadFile();
+</code>
+<p>
+<b>Resuming Downloads</b>
+<p>
+The component also supports resuming failed downloads by using the <var>StartByte</var> property. If the download was interrupted, set
+<var>StartByte</var> to the appropriate offset before calling this method to resume the download.
+</p>
+<code lang='csharp'>
+dropbox.ResourcePath = myRemoteFile;
+dropbox.LocalFile = downloadFile;
+dropbox.DownloadFile();
+
+//The transfer is interrupted and DownloadFile() above fails. Later, resume the download:
+
+//Get the size of the partially download file
+dropbox.StartByte = new FileInfo(downloadFile).Length; 
+dropbox.ResourcePath = myRemoteFile;
+dropbox.LocalFile = downloadFile;
+dropbox.DownloadFile();
+</code>
+<p>
+<b>Resuming Encrypted File Downloads</b>
+<p>
+Resuming encrypted file downloads is only supported when <var>LocalFile</var> was set in the initial download attempt. 
+When beginning an encrypted download
+if <var>LocalFile</var> is set the component will create a temporary file in <var>TempPath</var> to hold the encrypted data until it is 
+complete.
+<p>
+If the download is interrupted <var>DownloadTempFile</var> will be populated with the temporary file holding the partial data.
+When resuming, <var>DownloadTempFile</var> must be populated along with <var>StartByte</var> to allow the remainder of the encrypted data 
+to be downloaded. Once the encrypted data is downloaded it will be decrypted and written to <var>LocalFile</var>.
+</p>
+<code lang='csharp'>
+dropbox.ResourcePath = myRemoteFile;
+dropbox.LocalFile = downloadFile;
+dropbox.EncryptionPassword = "password";
+dropbox.DownloadFile();
+
+//The transfer is interrupted and DownloadFile() above fails. Later, resume the download:
+
+//Get the size of the partially download temp file
+dropbox.StartByte = new FileInfo(dropbox.Config("DownloadTempFile")).Length; 
+dropbox.ResourcePath = myRemoteFile;
+dropbox.LocalFile = downloadFile;
+dropbox.EncryptionPassword = "password";
+dropbox.DownloadFile();
+</code>
+<p>
+<h3>Uploading Files</h3>
+<p>
+<var>LocalFile</var> specifies the file to upload. The data to upload may also be set in <var>ResourceData</var> 
+or set by <var>SetUploadStream</var>.
+<p>
+The <i>FileName</i> parameter of <var>UploadFile</var> specifies the name of the file to be written.
+<p>
+A file can be uploaded to a specific folder by specifying the absolute path in the <i>FileName</i> parameter, 
+or by setting <var>ResourcePath</var> to the folder. Absolute paths begin with a "/" character and must include the full
+path beginning at the root. For instance:
+</p>
+<code lang='csharp'>
+//Upload to the root folder
+  dropbox.ResourcePath = ""; 
+  string path = dropbox.UploadFile("test.txt");
+  //path is "/test.txt"
+
+//Upload to a folder (relative path)
+  dropbox.CreateFolder("/uploadtest");
+  path = dropbox.UploadFile("test.txt");
+  //path is "/uploadtest/test.txt"
+
+//Upload to a folder (absolute path)
+  path = dropbox.UploadFile("/uploadtest/test.txt");
+  //path is "/uploadtest/test.txt"
+</code>
+<p>
+To encrypt a file before uploading set <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var>.
+<p>
+When the upload is complete the component will fire the <var>UploadComplete</var> event and 
+<var>UploadFile returns the absolute path to the uploaded file. 
+<p>
+<b>Upload Notes</b>
+<p>
+Dropbox offers two ways to upload a file. For smaller files a simple upload option is provided 
+to upload data in one request. This is the default option. For larger files uploads can be fragmented into 
+multiple pieces, allowing resuming of uploads that may be interrupted.
+<p>
+<b>Simple</b>
+<p>
+By default, the component uses the simple upload mechanism. <![ %csjava [Simple uploads are the only supported option when <var>SetUploadStream</var> is used.]]>
+</p>
+<code lang='csharp'>
+dropbox.LocalFile = "../MyFile.zip";
+dropbox.UploadFile("/folder/MyFile.zip");
+</code>
+<p>
+The following properties are applicable when calling <var>UploadFile</var> and <var>UseResumableUpload</var> if False (default - simple upload):
+<ul>
+<li><var>LocalFile</var>
+<li><var>ResourceData</var>
+<li><var>ResourcePath</var>
+<li><var>Overwrite</var>
+<li><var>RenameIfExists</var>
+</ul>
+
+
+
+<p>
+<b>Resumable</b>
+<p>
+To enable resumable uploads set <var>UseResumableUpload</var> to True. This is recommended for large files.
+The component will automatically fragment the specified file into smaller pieces and upload each individually.
+<var>FragmentSize</var> may be set to specify the size of the fragment if desired. The default fragment size is 10 MB.
+<p>
+When <var>UseResumableUpload</var> is set to True and <var>UploadFile</var> is called a resumable upload session is started by the component.
+<var>UploadSessionId</var> is populated with the Id of the session. This value may be needed for additional operations if the 
+upload does not complete normally. Additionally, <var>StartByte</var> is updated as necessary by the component to indicate the current
+offset in the file.
+<p>
+If the upload is interrupted for any reason the upload may be resumed. To resume an upload, verify that <var>UploadSessionId</var> and 
+<var>StartByte</var> are populated. If the same instance of the component is used these should already be populated and no 
+special action is needed. Call <var>UploadFile</var> again to resume the upload at the specified <var>StartByte</var> offset.
+<p>
+The <var>FragmentComplete</var> event fires after each fragment is uploaded to indicate overall progress. 
+</p>
+<code lang='csharp'>
+dropbox.LocalFile = "../MyFile.zip";
+dropbox.UploadFile("MyFile.zip");
+
+//The transfer is interrupted and UploadFile() above fails. Later, resume the download.
+//Using the same instance StartByte and UploadSessionId are already populated 
+//from the previous upload attempt
+dropbox.UploadFile("MyFile.zip");
+</code>
+<p>
+The following properties are applicable when calling <var>UploadFile</var> and <var>UseResumableUpload</var> if True:
+<ul>
+<li><var>LocalFile</var>
+<li><var>ResourceData</var>
+<li><var>ResourcePath</var>
+<li><var>Overwrite</var>
+<li><var>RenameIfExists</var>
+<li><var>StartByte</var>
+<li><var>UploadSessionId</var>
+</ul>
+
+<p>
+<h3>Additional Functionality</h3>
+<p>
+The Dropbox component offers advanced functionality beyond simple uploads and downloads. For instance:
+<ul>
+<li>Encrypt and decrypt files using <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var>.
+<li>Use <var>CopyResource</var>, <var>MoveResource</var>, and <var>DeleteResource</var> to manage files and folders.
+<li><var>ShareResource</var> creates shareable links to content.
+<li><var>ListChanges</var> lists all changes in a folder from a given point to facilitate syncing local and remote copies.
+<li><var>Search</var> can be used to search for matching content.
+<li>Revisions are supported through <var>ListRevisions</var> and <var>RestoreResource</var>.
+<li><var>GetUsageInfo</var> and <var>GetAccountInfo</var> provide usage and account information.
+<li><var>GetPreview</var> and <var>GetThumbnail</var> retrieve preview information for files.
+<li>And more!
+</ul>
+
+
+<h2 class="padding-submenu" id="googledrive">Google Drive</h2>
+<p>
+The GoogleDrive component provides a simple interface to working with Google Drive. Capabilities 
+include uploading and downloading files, strong encryption support, creating folders, moving and copying resource, and more. 
+</p>
+<p>
+To begin, first create an account and register your application with Google Drive. Consult the Google Drive documentation
+for instructions on this process.
+</p>
+<p>
+<h3>Authentication</h3>
+<p>
+Authentication is performed via OAuth 2.0. Use the OAuth component included in the toolkit, or any other OAuth 
+implementation to perform authentication and retrieve an authorization string. Once you've obtained an 
+authorization string like:
+</p></p>
+<p>
+<var>
+Bearer ya29.AHES6ZSZEJzATdZYjeihDn5W-VrXSsxEZu5p0pclxGdKKQ
+</var>
+<p>
+Assign this value to the Authorization property before attempting any operations. 
+Consult the Google Drive documentation for this particular service for more information about supported scope values and 
+more details on OAuth authentication. 
+<p>
+<b>OAuth Example</b>
+</p>
+<code lang='csharp'>
+oauth.ClientProfile = OauthClientProfiles.cfApplication;
+oauth.ClientId = OAUTH_CLIENT_ID;
+oauth.ClientSecret = OAUTH_SECRET_ID;
+oauth.RefreshToken = refreshToken;
+ 
+oauth1.AuthorizationScope = "https://www.googleapis.com/auth/drive";
+oauth.ServerAuthURL = "https://accounts.google.com/o/oauth2/auth";
+oauth.ServerTokenURL = "https://accounts.google.com/o/oauth2/token";
+ 
+oauth.Config("WebServerPort=7777"); // http://localhost:7777 is a registered redirect_uri for the app
+ 
+string authString = oauth.GetAuthorization();
+ 
+googledrive.Authorization = authString;
+</code>
+<p>
+<h3>Listing Resources</h3>
+<p>
+<var>ListResources</var> lists all files and folders for the current user.
+<p>
+After calling this method set <var>ResourceIndex</var> to a value from 0 to <var>ResourceCount</var> - 1. Setting <var>ResourceIndex</var> populates
+other Resource properties to provide information about the resource. After calling this method the following resource 
+properties are populated:
+<p>
+<ul>
+<li><var>ResourceContentAccessible</var>
+<li><var>ResourceCount</var>
+<li><var>ResourceCreatedTime</var>
+<li><var>ResourceDescription</var>
+<li><var>ResourseExtension</var>
+<li><var>ResourceId</var>
+<li><var>ResourceIndex</var>
+<li><var>ResourceMarker</var>
+<li><var>ResourceMD5Checksum</var>
+<li><var>ResourceMIMEType</var>
+<li><var>ResourceModifiedTime</var>
+<li><var>ResourceName</var>
+<li><var>ResourceOriginalName</var>
+<li><var>ResourceOwners</var>
+<li><var>ResourceParents</var>
+<li><var>ResourceSize</var>
+<li><var>ResourceStarred</var>
+<li><var>ResourceTrashed</var>
+<li><var>ResourceType</var>
+<li><var>ResourceViewed</var>
+</ul>
+<p>
+If the results are paged <var>ResourceMarker</var> will be populated. 
+Call <var>ListResources</var> again to retrieve the next page of results.
+Continue calling <var>ListResources</var> until <var>ResourceMarker</var> is empty string to retrieve all pages.
+</p>
+<code lang='csharp'>
+googledrive.ListResources();
+for (int i = 0; i < googledrive.ResourceCount; i++)
+{
+  googledrive.ResourceIndex = i;
+  Console.WriteLine(googledrive.ResourceName);
+  Console.WriteLine(googledrive.ResourceSize);
+  Console.WriteLine(googledrive.ResourceModifiedTime);
+}
+</code>
+<h3>Downloading Files</h3>
+<p>
+The <var>DownloadFile</var> method downloads a specific file. 
+<p>
+This method downloads the file selected by <var>ResourceIndex</var>. The file will be downloaded to the stream specified (if any) by <var>SetDownloadStream</var>. 
+If a stream is not specified and LocalFile is set the file will be saved to the specified location. If a stream is not specified and <var>LocalFile</var> is not set 
+the file data will be held by <var>ResourceData</var>.
+<p>
+The <i>MimeType</i> parameter specifies the formatting to be applied when saving the file, such as "text/plain". 
+Specify an empty string for this parameter to use the default format for the file. The following MIME types may be used to convert from a Google format file: 
+</p>
+<table class='table'>
+<tr><td><b>Google Format</b></td><td><b>Download Format</b>  </td><td><b>MIME Type</b></td></tr>
+<tr><td>Google Docs         </td><td>HTML                    </td><td>text/html</td></tr>
+<tr><td>                    </td><td>Plain text              </td><td>text/plain</td></tr>
+<tr><td>                    </td><td>Rich text               </td><td>application/rtf</td></tr>
+<tr><td>                    </td><td>Open Office document    </td><td>application/vnd.oasis.opendocument.text</td></tr>
+<tr><td>                    </td><td>PDF                     </td><td>application/pdf</td></tr>
+<tr><td>                    </td><td>MS Word                 </td><td>application/vnd.openxmlformats-officedocument.wordprocessingml.document</td></tr>
+<tr><td>Google Sheets       </td><td>MS Excel                </td><td>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</td></tr>
+<tr><td>                    </td><td>Open Office sheet       </td><td>application/x-vnd.oasis.opendocument.spreadsheet</td></tr>
+<tr><td>                    </td><td>PDF                     </td><td>application/pdf</td></tr>
+<tr><td>                    </td><td>CSV (first sheet only)  </td><td>text/csv</td></tr>
+<tr><td>Google Drawing      </td><td>JPEG                    </td><td>image/jpeg</td></tr>
+<tr><td>                    </td><td>PNG                     </td><td>image/png</td></tr>
+<tr><td>                    </td><td>SVG                     </td><td>image/svg+xml</td></tr>
+<tr><td>                    </td><td>PDF                     </td><td>image/pdf</td></tr>
+<tr><td>Google Slides       </td><td>MS Powerpoint           </td><td>application/vnd.openxmlformats-officedocument.presentationml.presentation</td></tr>
+<tr><td>                    </td><td>PDF                     </td><td>application/pdf</td></tr>
+<tr><td>                    </td><td>Plain text              </td><td>text/plain</td></tr>
+<tr><td>Google App Scripts  </td><td>JSON                    </td><td>application/vnd.google-apps.script+json</td></tr>
+</table>
+<p>
+To decrypt an encrypted file set <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var> before calling this method.
+</p>
+<code lang='csharp'>
+googledrive.ResourceId = fileId;
+googledrive.LocalFile = "../MyFile.zip";
+googledrive.DownloadFile("");
+</code>
+<p>
+<b>Resuming Downloads</b>
+<p>
+The component also supports resuming failed downloads by using the <var>StartByte</var> property. 
+If the download was interrupted, set <var>StartByte</var> to the appropriate offset before calling this method to resume the download.
+</p>
+<code lang='csharp'>
+googledrive.ResourceIndex = 0;
+googledrive.LocalFile = downloadFile;
+googledrive.DownloadFile("");
+
+//The transfer is interrupted and DownloadFile() above fails. Later, resume the download:
+
+//Get the size of the partially download file
+googledrive.StartByte = new FileInfo(downloadFile).Length; 
+googledrive.LocalFile = downloadFile;
+googledrive.DownloadFile("");
+</code>
+<p>
+<b>Resuming Encrypted File Downloads</b>
+<p>
+Resuming encrypted file downloads is only supported when <var>LocalFile</var> was set in the initial download attempt. 
+When beginning an encrypted download
+if <var>LocalFile</var> is set the component will create a temporary file in <var>TempPath</var> to hold the encrypted data until it is 
+complete.
+<p>
+If the download is interrupted <var>DownloadTempFile</var> will be populated with the temporary file holding the partial data.
+When resuming, <var>DownloadTempFile</var> must be populated along with <var>StartByte</var> to allow the remainder of the encrypted data 
+to be downloaded. Once the encrypted data is downloaded it will be decrypted and written to <var>LocalFile</var>.
+</p>
+<code lang='csharp'>
+googledrive.ResourceIndex = 0;
+googledrive.LocalFile = downloadFile;
+googledrive.EncryptionPassword = "password";
+googledrive.DownloadFile("");
+
+//The transfer is interrupted and DownloadFile() above fails. Later, resume the download:
+
+//Get the size of the partially download temp file
+googledrive.StartByte = new FileInfo(googledrive.Config("DownloadTempFile")).Length; 
+googledrive.LocalFile = downloadFile;
+googledrive.EncryptionPassword = "password";
+googledrive.DownloadFile("");
+</code>
+<p>
+<h3>Uploading Files</h3>
+<p>
+The <var>UploadFile</var> method uploads a new file. 
+<p>
+If <var>SetUploadStream</var> is called the specified stream will take priority as the file data source.
+If <var>LocalFile</var> is set the file will be uploaded from the specified path. If <var>LocalFile</var> is not set the data in <var>ResourceData</var> will be used.
+</p>
+<p>
+The name specified by the <i>FileName</i> parameter should include a file extension. If <var>MimeType</var> is "", the file will be uploaded as-is.
+The file can be converted to one of the Google formats by setting <var>MimeType</var> to one of the following MIME types:
+</p>
+<table class='table'>
+<tr><td><b>Original File Format</b>                               </td><td><b>Google Format</b></td><td><b>MIME Type</b></td></tr>
+<tr><td>MS Word, OpenDocument Text, HTML, RTF, Plain Text         </td><td>Google Docs         </td><td>application/vnd.google-apps.document</td></tr>
+<tr><td>MS Excel, OpenDocument Spreadsheet, CSV, TSV, Plain Text  </td><td>Google Sheets       </td><td>application/vnd.google-apps.spreadsheet</td></tr>
+<tr><td>MS Powerpoint, OpenDocument Presentation                  </td><td>Google Slides       </td><td>application/vnd.google-apps.presentation</td></tr>
+<tr><td>PDF, JPEG, PNG, GIF, BMP (images are embedded in a Doc)   </td><td>Google Docs         </td><td>application/vnd.google-apps.document</td></tr>
+<tr><td>Plain Text, JSON                                          </td><td>Google Apps Script  </td><td>application/vnd.google-apps.script</td></tr>
+</table>
+<p>
+Before calling this method set <var>ResourceIndex</var> to -1 to clear the existing selection. The following properties may also optionally be set: 
+</p>
+<p>
+<ul>
+<li><var>ResourceContentAccessible</var>
+<li><var>ResourceDescription</var>
+<li><var>ResourceStarred</var>
+<li><var>ResourceTrashed</var>
+<li><var>ResourceViewed</var>
+<li><var>ResourceModifiedTime</var>
+<li><var>ResourceParents</var>
+</ul>
+<p>
+This method returns the Id of the newly created file. To encrypt a file before uploading set 
+<var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var>.
+</p>
+<p>
+<b>Simple</b>
+</p>
+<p>
+By default, the component uses the simple upload mechanism. Additionally, simple uploads are the only supported option when <var>SetUploadStream</var> is used.
+</p>
+<code lang='csharp'>
+googledrive.LocalFile = "../MyFile.zip";
+googledrive.UploadFile("MyFile.zip", "");
+</code>
+<p>
+<b>Resumable</b>
+</p>
+<p>
+To enable resumable uploads set <var>UseResumableUpload</var> to True. This is recommended for large files. The component will automatically 
+fragment the specified file into smaller pieces and upload each individually. 
+<var>FragmentSize</var> may be set to specify the size of the fragment if desired. The default fragment size is 10 MB.
+</p>
+<p>
+When <var>UseResumableUpload</var> is set to True and <var>UploadFile</var> is called a resumable upload session is started by the component. 
+<var>ResumeURL</var> is populated with the URL identifying the session. This value may be needed for additional operations if the upload does not complete normally. 
+Additionally, <var>StartByte</var> is updated as necessary by the component to indicate the current offset in the file.
+</p>
+<p>
+If the upload is interrupted for any reason the upload may be resumed. To resume an upload, verify that <var>ResumeURL</var> and <var>StartByte</var> are populated. 
+If the same instance of the component is used these should already be populated and no special action is needed. 
+Call <var>UploadFile</var> again to resume the upload at the specified <var>StartByte</var> offset.
+</p>
+<p>
+If the upload is not resumed after some time the upload session will expire.
+</p>
+<p>
+<var>GetUploadStatus</var> may be used to check the status of a resumable upload. 
+The <var>FragmentComplete</var> event fires after each fragment is uploaded to indicate overall progress. 
+</p>
+<code lang='csharp'>
+googledrive.LocalFile = "../MyFile.zip";
+googledrive.UploadFile("MyFile.zip", "");
+
+//The transfer is interrupted and UploadFile() above fails. Later, resume the download.
+//Using the same instance StartByte and ResumeURL are already populated 
+//from the previous upload attempt
+googledrive.UploadFile("MyFile.zip", "");
+</code>
+<p>
+The following additional properties are applicable when calling <var>UploadFile</var> and <var>UseResumableUpload</var> if True: 
+</p>
+<p>
+<ul>
+<li><var>StartByte</var>
+<li><var>ResumeURL</var>
+</ul>
+</p>
+<h3>Additional Functionality</h3>
+<p>
+The Google Drive component offers advanced functionality beyond simple uploads and downloads. For instance:
+<ul>
+<li>Encrypt and decrypt files using <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var>.
+<li>Use <var>CopyResource</var>, <var>MoveToTrash</var>, <var>RestoreFromTrash</var>, <var>DeleteResource</var>, and <var>UpdateResource</var> to manage files and folders.
+<li><var>ListChanges</var> lists all changes in a drive from a given point to facilitate syncing local and remote copies.
+<li>List and update permission for files or folders using <var>ListPersmissions</var> and <var>UpdatePermissions</var>
+<li>And more!
+</ul>
+</p>
+
+
+<h2 class="padding-submenu" id="onedrive">OneDrive</h2>
+<p>
+The OneDrive component provides a simple interface to working with Microsoft OneDrive. Capabilities 
+include uploading and downloading files, strong encryption support, creating folders, moving and copying resources, and more. The component supports:</p>
+<ul>
+<li>OneDrive (Personal)</li>
+<li>OneDrive for Business</li>
+</ul>
+<p>In addition, the component can be set up to support Microsoft's Graph API by setting the <var>UseGraphAPI</var> configuration setting. For example:</p>
+<code lang='csharp'>
+onedrive.Config("UseGraphAPI=true");
+</code>
+<p>
+To begin, first create an account and register your application with OneDrive. Consult the OneDrive documentation
+for instructions on this process.
+<p>
+<h3>Authentication</h3>
+<p>
+Authentication is performed via OAuth 2.0. Use the OAuth component included in the toolkit, or any other OAuth 
+implementation to perform authentication and retrieve an authorization string. Once you've obtained an 
+authorization string like:
+<p>
+<var>
+Bearer ya29.AHES6ZSZEJzATdZYjeihDn5W-VrXSsxEZu5p0pclxGdKKQ
+</var>
+<p>
+Assign this value to the Authorization property before attempting any operations. 
+Consult the notes below for more information about supported OneDrive scope values and details on OAuth authorization. 
+<p>
+<h3>Authorization Notes</h3>
+<p>Microsoft currently offers two different OAuth systems, <b>Azure AD</b> and <b>Azure AD 2.0</b> (across which there are 3 sets of OAuth endpoints). Azure AD 2.0 is newer, and it supports nearly everything that Azure AD does (there are some limitations, refer to the Microsoft documentation for details). For the purpose of these notes, here are some notable differences:</p>
+<ul>
+<li>The place where you register your application is different based on which OAuth system you choose.
+<li>The Azure AD 2.0 OAuth system supports all Microsoft account types, but the Azure AD OAuth system only supports business and education accounts.
+<li>The Azure AD 2.0 OAuth system supports both the Microsoft Graph API and the legacy OneDrive API (using two sets of endpoints), whereas Azure AD only supports the Microsoft Graph API.
+<li>The Azure AD 2.0 OAuth system has support for OAuth scopes, but the Azure AD OAuth system does not*.
+</ul>
+<p>
+* See below "OneDrive for Business Notes" for details. The following sections summarize the relevant information based on use case. For additional details please consult the Microsoft documentation.</p>
+<p>
+<b>OneDrive (Personal) Notes</b>
+<p>
+Applications that want to authenticate users to OneDrive (Personal) must use Azure AD 2.0, but can use either the Microsoft Graph or the legacy OneDrive API. To begin, your application must be registered as a "Converged Application" at <var>https://apps.dev.microsoft.com</var>. Once the application is registered, use this table to help you use the OAUTH and OneDrive components to access the service; each row represents a valid use-case:
+<table class="table">
+<tr><td><b>API Endpoint</b></td>                                                                                 <td><b>Auth Endpoints</b></td>                                                                                                                   <td><b>Valid OAuth Scopes</b></td>
+<tr><td>Microsoft Graph<br><var>https://graph.microsoft.com/v1.0</var><br>(Set UseGraphAPI to True)</td><td><var>https://login.microsoftonline.com/common/oauth2/v2.0/authorize<br>https://login.microsoftonline.com/common/oauth2/v2.0/token</var></td><td>Refer to the Microsoft Graph API's OneDrive documentation.</td>
+<tr><td>OneDrive (legacy)<br><var>https://api.onedrive.com/v1.0</var><br>(Set UseGraphAPI to False)</td>   <td><var>https://login.live.com/oauth20_authorize.srf<br>https://login.live.com/oauth20_token.srf</var></td>                                     <td><var>offline_access, onedrive.readonly, onedrive.readwrite, onedrive.appfolder</var></td>
+</table>
+<p>
+<b>OneDrive for Business Notes</b>
+<p>
+Applications that want to authenticate users to OneDrive for Business can use either Azure AD or Azure AD 2.0, but must use the Microsoft Graph API (set UseGraphAPI to True). Depending on which OAuth system you choose, your application must be registered in a different place, and you'll use slightly different endpoints to authenticate. Use this table to help you determine where to register your application and which endpoints to use for authentication; each row represents a valid use-case:
+<table class="table">
+<tr><td><b>OAuth System</b></td><td><b>App Registration Portal</b></td>                                                  <td><b>Auth Endpoints</b></td>
+<tr><td>Azure AD 2.0</td><td><var>https://apps.dev.microsoft.com</var><br>("Converged Application")</td> <td><var>https://login.microsoftonline.com/common/oauth2/v2.0/authorize<br>https://login.microsoftonline.com/common/oauth2/v2.0/token</var></td>
+<tr><td>Azure AD</td>            <td>"App Registrations" Blade<br>on <var>https://portal.azure.com</var></td>     <td><var>https://login.microsoftonline.com/common/oauth2/authorize<br>https://login.microsoftonline.com/common/oauth2/token</var></td>
+</table>
+For the OAuth scopes supported by Azure AD 2.0, refer to the Microsoft Graph API's OneDrive documentation.
+<p>
+Since the Azure AD OAuth system doesn't support OAuth scopes, you must pre-configure your application's permissions in
+the appropriate registration portal (noted below), and then add a "resource" parameter to your OAuth requests. Using our OAUTH component, you can do this (before calling) by doing:</p>
+<code lang="csharp">
+oauth.AddParam("resource", "https://graph.microsoft.com/");
+</code>
+<p>
+<b>Supporting Both OneDrive Personal and OneDrive Business</b>
+<p>
+In order to support all Microsoft account types (and thus OneDrive (Personal) and OneDrive for Business),  use Azure AD 2.0 and the Microsoft Graph API. Refer to the relevant information in either of the sections above.</p>
+</p>
+<p>
+<h3>Listing Resources</h3>
+<p>
+<var>ListResources</var> lists resources within the drive at the specified path.
+<p>
+Calling this method without specifying <var>ResourceParentId</var> or <var>ResourceParentPath</var> will list all resources in the drive's root.
+To list resources of a specific folder set either <var>ResourceParentId</var> or <var>ResourceParentPath</var> prior to calling this method. When 
+<var>ResourceParentId</var> is set, it takes precedence over <var>ResourceParentPath</var>.
+<p>
+When either <var>ResourceParentId</var> or <var>ResourceParentPath</var>, children of the specified parent folder will be listed. These two
+properties can be set before calling this method to navigate the drive. If both are specified <var>ResourceParentId</var> takes precedence.
+If both are unspecified the drive root is assumed.
+<p>
+After calling this method set <var>ResourceIndex</var> to a value from 0 to <var>ResourceCount</var> - 1. Setting <var>ResourceIndex</var> populates
+other Resource properties to provide information about the resource. After calling this method the following resource 
+properties are populated:
+<p>
+<ul>
+<li><var>ResourceCount</var>
+<li><var>ResourceCRC32Hash</var>
+<li><var>ResourceCreatedDate</var>
+<li><var>ResourceData</var>
+<li><var>ResourceDeleted</var>
+<li><var>ResourceDescription</var>
+<li><var>ResourceDownloadURL</var>
+<li><var>ResourceETag</var>
+<li><var>ResourceId</var>
+<li><var>ResourceIndex</var>
+<li><var>ResourceMarker</var>
+<li><var>ResourceMIMEType</var>
+<li><var>ResourceModifiedDate</var>
+<li><var>ResourceName</var>
+<li><var>ResourceParentId</var>
+<li><var>ResourceParentPath</var>
+<li><var>ResourcePath</var>
+<li><var>ResourceSHA1Hash</var>
+<li><var>ResourceSize</var>
+<li><var>ResourceType</var>
+<li><var>ResourceWebURL</var>
+</ul>
+<p>
+If the results are paged <var>ResourceMarker</var> will be populated. 
+Call <var>ListResources</var> again to retrieve the next page of results.
+Continue calling <var>ListResources</var> until <var>ResourceMarker</var> is empty string to retrieve all pages.
+</p>
+<code lang='csharp'>
+onedrive.ListResources();
+for (int i = 0; i < onedrive.ResourceCount; i++)
+{
+  onedrive.ResourceIndex = i;
+  Console.WriteLine(onedrive.ResourceName);
+  Console.WriteLine(onedrive.ResourceSize);
+  Console.WriteLine(onedrive.ResourceModifiedDate);
+}
+</code>
+<p>
+<h3>Downloading Files</h3>
+<p>
+The <var>DownloadFile</var> method downloads a specific file. 
+<p>
+Any of the following properties may be set to specify the file to download:
+<ul>
+<li><var>ResourceId</var>
+<li><var>ResourcePath</var>
+<li><var>ResourceDownloadURL</var>
+</ul>
+The file will be downloaded to the stream specified (if any) by <var>SetDownloadStream</var>.
+If a stream is not specified and <var>LocalFile</var> is set the file will be saved to the specified location.
+If a stream is not specified and <var>LocalFile</var> is not set the file data will be held by <var>ResourceData</var>.
+<p>
+To decrypt an encrypted file set <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var> before calling this method.
+</p>
+<code lang='csharp'>
+onedrive.ResourceId = fileId;
+onedrive.LocalFile = "../MyFile.zip";
+onedrive.DownloadFile();
+</code>
+<p>
+<b>Resuming Downloads</b>
+<p>
+The component also supports resuming failed downloads by using the <var>StartByte</var> property. If the download was interrupted, set
+<var>StartByte</var> to the appropriate offset before calling this method to resume the download.
+</p>
+<code lang='csharp'>
+onedrive.ResourceId = fileId;
+onedrive.LocalFile = downloadFile;
+onedrive.DownloadFile();
+
+//The transfer is interrupted and DownloadFile() above fails. Later, resume the download:
+
+//Get the size of the partially download file
+onedrive.StartByte = new FileInfo(downloadFile).Length; 
+onedrive.ResourceId = fileId;
+onedrive.LocalFile = downloadFile;
+onedrive.DownloadFile();
+</code>
+<p>
+<b>Resuming Encrypted File Downloads</b>
+<p>
+Resuming encrypted file downloads is only supported when <var>LocalFile</var> was set in the initial download attempt. 
+When beginning an encrypted download
+if <var>LocalFile</var> is set the component will create a temporary file in <var>TempPath</var> to hold the encrypted data until it is 
+complete.
+<p>
+If the download is interrupted <var>DownloadTempFile</var> will be populated with the temporary file holding the partial data.
+When resuming, <var>DownloadTempFile</var> must be populated along with <var>StartByte</var> to allow the remainder of the encrypted data 
+to be downloaded. Once the encrypted data is downloaded it will be decrypted and written to <var>LocalFile</var>.
+</p>
+<code lang='csharp'>
+onedrive.ResourceId = fileId;
+onedrive.LocalFile = downloadFile;
+onedrive.EncryptionPassword = "password";
+onedrive.DownloadFile();
+
+//The transfer is interrupted and DownloadFile() above fails. Later, resume the download:
+
+//Get the size of the partially download temp file
+onedrive.StartByte = new FileInfo(onedrive.Config("DownloadTempFile")).Length; 
+onedrive.ResourceId = fileId;
+onedrive.LocalFile = downloadFile;
+onedrive.EncryptionPassword = "password";
+onedrive.DownloadFile();
+</code>
+<p>
+<h3>Uploading Files</h3>
+<p>
+<var>LocalFile</var> specifies the file to upload. The data to upload may also be set in <var>ResourceData</var> 
+or set by <var>SetUploadStream</var>.
+<p>
+The <i>FileTitle</i> parameter of <var>UploadFile</var> specifies the name of the file to be written in the drive.
+<p>
+To upload a file in a specific folder set <var>ResourceParentId</var> or <var>ResourceParentPath</var> to indicate the parent folder.
+If both are specified <var>ResourceParentId</var> takes precedence. If both are unspecified the drive root is assumed.
+<p>
+To encrypt a file before uploading set <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var>.
+<p>
+The <var>UploadFile</var> method returns the Id of the resource which was uploaded.
+<p>
+<b>Upload Notes</b>
+<p>
+Microsoft OneDrive offers two ways to upload a file. For smaller files a simple upload option is provided 
+to upload data in one request. This is the default option. For larger files uploads can be fragmented into 
+multiple pieces, allowing resuming of uploads that may be interrupted.
+<p>
+<b>Simple</b>
+<p>
+By default the component uses the simple upload mechanism. Only files up to 100 MB can be uploaded using the default simple
+upload. Additionally, simple uploads are the only supported option when <var>SetUploadStream</var> is used.
+</p>
+<code lang='csharp'>
+onedrive.LocalFile = "../MyFile.zip";
+onedrive.UploadFile("MyFile.zip");
+</code>
+<p>
+The following properties are applicable when calling <var>UploadFile</var> and <var>UseResumableUpload</var> if False (default - simple upload):
+<ul>
+<li><var>LocalFile</var>
+<li><var>ResourceData</var>
+<li><var>ResourceParentId</var>
+<li><var>ResourceParentPath</var>
+<li><var>Overwrite</var>
+<li><var>RenameIfExists</var>
+</ul>
+<p>
+<b>Resumable</b>
+<p>
+To enable resumable uploads set <var>UseResumableUpload</var> to True. This is recommended for files larger than 10 MB.
+The component will automatically fragment the specified file into smaller pieces and upload each individually.
+<var>FragmentSize</var> may be set to specify the size of the fragment if desired. The default fragment size is 10 MB.
+<p>
+When <var>UseResumableUpload</var> is set to True and <var>UploadFile</var> is called a resumable upload session is started by the component.
+<var>ResumeURL</var> is populated with the URL identifying the session. This value may be needed for additional operations if the 
+upload does not complete normally. Additionally <var>StartByte</var> is updated as necessary by the component to indicate the current
+offset in the file.
+<p>
+If the upload is interrupted for any reason the upload may be resumed. To resume an upload verify that <var>ResumeURL</var> and 
+<var>StartByte</var> are populated. If the same instance of the component is used these should already be populated and no 
+special action is needed. Call <var>UploadFile</var> again to resume the upload at the specified <var>StartByte</var> offset.
+<p>
+If a resumable upload is interrupted for any reason, <var>AbortUpload</var> may be called to cancel the upload. 
+If the upload is not resumed after some time the upload session will expire. <var>UploadExpDate</var> may be checked to
+determine when the upload session expires.
+<p>
+<var>GetUploadStatus</var> may be used to check the status of a resumable upload. The <var>FragmentComplete</var> event 
+fires after each fragment is uploaded to indicate overall progress. 
+</p>
+<code lang='csharp'>
+onedrive.LocalFile = "../MyFile.zip";
+onedrive.UploadFile("MyFile.zip");
+
+//The transfer is interrupted and UploadFile() above fails. Later, resume the download.
+//Using the same instance StartByte and ResumeURL are already populated 
+//from the previous upload attempt
+onedrive.UploadFile("MyFile.zip");
+</code>
+<p>
+The following properties are applicable when calling <var>UploadFile</var> and <var>UseResumableUpload</var> if True:
+<ul>
+<li><var>LocalFile</var>
+<li><var>ResourceData</var>
+<li><var>ResourceParentId</var>
+<li><var>ResourceParentPath</var>
+<li><var>Overwrite</var>
+<li><var>RenameIfExists</var>
+<li><var>StartByte</var>
+<li><var>ResumeURL</var>
+</ul>
+<p>
+<h3>Additional Functionality</h3>
+<p>
+The OneDrive component offers advanced functionality beyond simple uploads and downloads. For instance:
+<ul>
+<li>Encrypt and decrypt files using <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var>.
+<li>Use <var>CopyResource</var>, <var>MoveResource</var>, <var>DeleteResource</var>, and <var>UpdateResource</var> to manage files and folders.
+<li><var>CreateLink</var> creates shareable links to content.
+<li><var>ListChanges</var> lists all changes in a drive from a given point to facilitate syncing local and remote copies.
+<li><var>Search</var> can be used to search for matching content.
+<li><var>ListDrives</var> provides the capability for multiple drives.
+<li>And more!
+</ul>
+</p>
+
+<h2 class="padding-submenu" id="sponline">SharePoint Online</h2>
+<p>
+The SharePoint component provides a simple interface to manage SharePoint documents. Capabilities include uploading 
+downloading files, strong encryption support, creating folders, and more.
+</p>
+<h3>Authentication</h3>
+<p>
+Authentication is performed by setting the <var>User</var> and <var>Password</var> properties. 
+</p>
+<code lang='csharp'>
+sharepoint1 = new SharePoint();
+sharepoint1.User = "test@mycrm.onmicrosoft.com";
+sharepoint1.Password = "password";
+sharepoint1.URL = "https://mycrm.sharepoint.com/";
+</code>
+<h3>List Documents</h3>
+<p>
+The <var>List</var> method will list all the documents contained in the specified <var>DocumentLibrary</var>. The 
+following fields are populated after calling this method:
+</p>
+<p><ul>
+<li><var>FileName</var></li>
+<li><var>FileReference</var></li>
+<li><var>Created</var></li>
+<li><var>Modified</var></li>
+<li><var>Author</var></li>
+<li><var>CheckedOutBy</var></li>
+<li><var>SourceControlVersion</var></li>
+<li><var>IsFolder</var></li>
+</ul></p>
+<p><b>List Documents Example</b></p>
+<code lang='csharp'>
+//Call to list documents
+sharepoint1.List();
+
+//Document information assigned to properties during Document Event
+void sharepoint1_OnDocument(Object sender, SharePointDocumentEventArgs e)
+{
+  Console.WriteLine(e.FileName);
+  Console.WriteLine(e.Created);
+  Console.WriteLine(e.Author);
+}
+
+</code>
+<h3>Get, Copy, Delete, Add, and Move Documents</h3>
+<p>
+The SharePoint component provides easy document managing with simple calls such as:
+<ul>
+<li><var>Get</var> retrieves a document from the library specified by <var>DocumentLibrary</var>.</li>
+<li><var>Copy</var> copies the specified document to a new location.</li>
+<li><var>Delete</var> deletes a document from the library specified by <var>DocumentLibrary</var>.</li>
+<li><var>Add</var> adds a document to the library specified by <var>DocumentLibrary</var>.</li>
+<li><var>Move</var> moves the specified document to a new <var>DocumentLibrary</var>.</li>
+<li><var>Rename</var> renames the specified document.</li>
+</ul>
+</p> 
+<h3>Checking Documents In and Out</h3>
+<p>
+The SharePoint component allows users to <var>CheckOut</var> documents to prevent other users from altering the document until 
+the document is checked backed in using the <var>CheckIn</var> call.  
+<p>When <var>CheckOut</var> is called the document is not retrieved.  The <var>Get</var> method should called
+to retrieve the document</p>
+<p>
+<b>Check Out, Get, Check In Example</b>
+<p></p>
+<code lang='csharp'>
+//this will prevent others from altering test.txt
+sharepoint1.CheckOut("test.txt");
+
+//this will get the document 
+sharepoint1.Get("test.txt");
+
+//finally this will check back in the document with a comment added
+sharepoint1.CheckIn("test.txt", "Made a couple of changes to test.txt");
+</code>
+</p>
+<h3>List Versions</h3>
+<p>
+The SharePoint component will allow for a list of all the versions of a specified file to be listed using 
+the <var>ListVersions</var> method. 
+</p>
+<p><b>ListVersions Example</b></p>
+<code lang='csharp'>
+sharepoint1.ListVersions("MyDocument1.txt");
+for(int i = 0; i < sharepoint1.Versions.Count; i++)
+{
+  Console.WriteLine(sharepoint1.Versions[i].CreatedBy);
+  Console.WriteLine(sharepoint1.Versions[i].Date);
+  Console.WriteLine(sharepoint1.Versions[i].Size);
+}
+</code>
+<h3>Additional Functionality</h3>
+<p>
+The SharePoint component offers advanced functionality beyond simple uploads and downloads. For instance:
+<ul>
+<li>Encrypt and decrypt files using <var>EncryptionAlgorithm</var> and <var>EncryptionPassword</var>.</li>
+<li><var>AddFolder</var> adds a new folder to the document library</li>
+<li>Use streams to upload and download documents using the <var>SetDownloadStream</var> and <var>SetUploadStream</var> methods.</li>
+<li><var>Rename</var> and <var>Move</var> files</li>
+<li>And more!</li>
+</ul>
+</p>
+
+<h2 class="padding-submenu" id="wasabi">Wasabi</h2>
+<p>
+Wasabi has an API that is fully compatible with that of Amazon S3, allowing you to store arbitrary data using the same bucket-and-object paradigm that S3 uses. But Wasabi is more than just an S3 alternative; it's faster, cheaper, and it adds additional functionality on top of the S3 API. Whether you're doing simple bucket-and-object data manipulation, or leveraging Wasabi-exclusive API features, the Wasabi component makes it easy to access the Wasabi service quickly and securely.
+</p>
+<p>
+Since Wasabi's API is a superset of the Amazon S3 API, refer to the <a href="#amazons3">Amazon S3</a> section for information about basic bucket and object manipulation. This section will cover Wasabi-exclusive functionality.
+</p>
+<p>
+To begin, first create a Wasabi service account and obtain an access and secret key. Consult the Wasabi documentation for instructions on this process.
+</p>
+<h3>Authentication</h3>
+<p>
+Authentication is performed using the <var>AccessKey</var> and <var>SecretKey</var> provided by Wasabi. 
+</p>
+<p><b>Setting Access and Secret Keys Example</b></p>
+<code lang='csharp'>
+wasabi = new Wasabi();
+wasabi.AccessKey = WASABI_ACCESS_KEY;
+wasabi.SecretKey = WASABI_SECRET_KEY;
+</code>
+<h3>Renaming</h3>
+<p>
+Wasabi provides the ability to rename buckets, objects, and folders.
+</p>
+<p><b>Renaming Buckets</b></p>
+<p>
+Renaming buckets is simple, and doesn't require setting the <var>Bucket</var> property or calling the <var>ListBuckets</var> method first. The new bucket name cannot already be in use.
+</p>
+<code lang="csharp">
+wasabi.RenameBucket("MyBucket", "MyRenamedBucket");
+</code>
+<p><b>Renaming Objects and Folders</b></p>
+<p>
+Renaming objects and folders is easy too, and again doesn't require you to call the <var>ListObjects</var> method first. If you have versioning enabled on the owning bucket, or if the <var>OverwriteOnRename</var> configuration setting set to <var>True</var> (the default), objects and folders will be overwritten automatically if there is a naming conflict. The following code shows how to rename an object:
+</p>
+<code lang="csharp">
+wasabi.Bucket = "MyBucket";
+wasabi.RenameObject("cats.jpg", "dogs.jpg");
+</code>
+<p>
+Note that, due to how Wasabi's data structure works, "folders" are really just name prefixes formatted to mimic a traditional file system. Due to this, the <var>RenameFolders</var> method can rename multiple levels of "folders" at once since it is actually just renaming a prefix. The following code shows this.
+</p>
+<code lang="csharp">
+// Assume we start with these objects in our bucket:
+// "/pictures/animals/cats/cat1.jpg"
+// "/pictures/animals/cats/cat2.jpg"
+// "/pictures/animals/cats/cat3.jpg"
+// "/pictures/animals/cats/cat4.jpg"
+// "/pictures/animals/dogs/dog4.jpg"
+// "/pictures/animals/dogs/dog5.jpg"
+wasabi.Bucket = "MyBucket";
+
+// If we do this...
+wasabi.RenameFolder("/pictures/animals/cats/", "pictures/pets/dogs");
+
+// We will end up with these objects:
+// "/pictures/pets/dogs/cat1.jpg"
+// "/pictures/pets/dogs/cat2.jpg"
+// "/pictures/pets/dogs/cat3.jpg"
+// "/pictures/pets/dogs/cat4.jpg"
+// "/pictures/pets/dogs/dog4.jpg"
+// "/pictures/pets/dogs/dog5.jpg"
+
+// If we did this instead...
+wasabi.RenameFolder("/pictures/animals/cats/cat", "pictures/pets/dogs/dog");
+
+// We would instead be left with these objects (Note how the original dog4.jpg was overwritten
+// with the original cat4.jpg due to the prefix rename including part of the "filename"):
+// "/pictures/pets/dogs/dog1.jpg"
+// "/pictures/pets/dogs/dog2.jpg"
+// "/pictures/pets/dogs/dog3.jpg"
+// "/pictures/pets/dogs/dog4.jpg"
+// "/pictures/pets/dogs/dog5.jpg"
+</code>
+<h3>Object Composition</h3>
+<p>
+Object composition is a server-side method of building an object by concatenating multiple existing objects together. This feature of Wasabi is a simpler alternative to the typical multipart-upload method of building objects.
+</p>
+<p>
+A composed object looks and acts just like a regular object. However, its data is determined by its <i>component objects</i> (that is, the objects that make it up) and the order in which they are composed together.
+</p>
+<p>
+The Wasabi component's <var>ComposeObjects</var> method is used to do object composition. To use this method, you must first specify the names of the objects you wish to compose together using the <var>Objects</var> property. When you call the method, the <i>ComposedObjectName</i> parameter determines what name is given to the resulting composed object. See the following code snippet for examples of how you can compose objects:
+</p>
+<code lang="csharp">
+// Upload some objects to start with. Let's assume we have some text files to upload.
+for (int i = 1; i <= 3; i++) {
+    wasabi.LocalFile = "file" + i + ".txt";
+    wasabi.CreateObject("file" + i + ".txt");
+}
+
+// Compose a new object.
+SetObjectNames("file1.txt", "file2.txt", "file3.txt");
+wasabi.ComposeObjects("composed1.txt");
+
+// Compose a new object using a composed object.
+SetObjectNames("file1.txt", "composed1.txt");
+wasabi.ComposeObjects("composed2.txt");
+
+// Compose onto an existing composed object. 
+// (Similar to appending, but all server-side, no uploading needed.)
+SetObjectNames("file1.txt", "file2.txt");
+wasabi.ComposeObjects("composed3.txt");
+SetObjectNames("composed3.txt", "file3.txt");
+wasabi.ComposeObjects("composed3.txt");
+
+// Compose a new object using the same object twice.
+SetObjectNames("file1.txt", "file1.txt");
+wasabi.ComposeObjects("composed4.txt");
+
+// Compose a composed object onto itself.
+SetObjectNames("composed4.txt", "composed4.txt");
+wasabi.ComposeObjects("composed4.txt");
+</code>
+<p>
+Assume we have this helper method for the above code:
+</p>
+<code lang="csharp">
+void SetObjectNames(params string[] names) {
+    wasabi.Objects.Clear();
+    foreach (string name in names) wasabi.Objects.Add(new WasabiObject(name));
+}
+</code>
+<p>
+As you can see, object composition is a powerful and flexible feature. However, there are some things to keep in mind when doing object composition:
+<ul>
+<li>The order of the object names in the <var>Objects</var> property is the order that they will be concatenated in when they are composed.</li>
+<li>Wasabi does not allow composing objects from multiple buckets together.</li>
+<li>Wasabi will not allow you to specify more than 32 object names in a single compose request.</li>
+<li>Wasabi will not allow you to compose more than 1024 original objects together. This is a transitive limit, you cannot circumvent it by composing together composed objects.</li>
+</ul>
+</p>
+<p>
+Wasabi does not make copies of data when composing objects, it uses references, so there are no extra data charges. Even if the original objects are deleted, a single copy of the data is kept until there are no longer any composed objects which reference it. Refer to the Wasabi documentation for more information.
+</p>
+<h3>Compliance</h3>
+<p>
+Compliance is a Wasabi feature that prevents objects from being modified or deleted before a specified time. The following tables and examples show what compliance settings are available at the bucket- and object-levels, what they do, and how they are used. Be sure to review the documentation for each of the individual settings for more information about them.
+</p>
+<p>
+<b>Bucket Compliance Settings</b>
+<table class="table">
+<tr><td><b>Name</b></td>                    <td><b>Description</b></td></tr>
+<tr><td><var>Status</var></td>              <td>Whether or not compliance is enabled for a bucket. Either "enabled" or "disabled".</td></tr>
+<tr><td><var>LockTime</var></td>            <td>If not "off" (default), the time at which the compliance settings for a bucket were/should be locked.</td></tr>
+<tr><td><var>RetentionDays</var></td>       <td>An integer representing the minimum number of days to retain objects in a bucket. Defaults to 0.</td></tr>
+<tr><td><var>ConditionalHold</var></td>     <td>Whether or not newly created objects in a bucket should be placed under conditional hold. Defaults to "false".</td></tr>
+<tr><td><var>DeleteAfterRetention</var></td><td>Whether or not to automatically delete objects after their retention time has been passed. Defaults to "false".</td></tr>
+</table>
+(Note that there is also a read-only <var>IsLocked</var> field which is set based on the value of <var>LockTime</var>.)
+</p>
+<p>
+Compliance starts at the bucket level, it must be turned on for a bucket in order for the objects within that bucket to be under compliance. The component makes this easy to do:
+</p>
+<code lang="csharp">
+wasabi.Bucket = "MyBucket";
+wasabi.BucketCompliance = new WasabiBucketCompliance("enabled", "", 10, "true", "");
+wasabi.UpdateCompliance("");
+</code>
+<p>
+This code turns on compliance settings for the bucket called "MyBucket", setting them so that objects are placed under conditional hold, and must be retained for 10 days after the conditional hold is released. The <var>LockTime</var> and <var>DeleteAfterRetention</var> settings are left alone, so they will default to "off" and "false" (respectively).
+</p>
+<p>
+<b>Important:</b> Locking the compliance settings on a bucket using the <var>LockTime</var> setting is a one-way action. You cannot unlock a bucket's compliance settings without contacting the Wasabi support team. Refer to the Wasabi documentation for more information.
+</p>
+<p>
+<b>Object Compliance Settings</b>
+<table class="table">
+<tr><td><b>Name</b></td>                <td><b>Description</b></td></tr>
+<tr><td><var>RetentionTime</var></td>   <td>An ISO 8601 date-time before which an object cannot be deleted. Defaults to the time at which the object was created (or at which compliance was turned on) <i>plus</i> the value of the bucket's <var>RetentionDays</var> setting at that time.</td></tr>
+<tr><td><var>LegalHold</var></td>       <td>Whether or not an object is under legal hold, preventing it from being deleted. Defaults to "false".</td></tr>
+<tr><td><var>ConditionalHold</var></td> <td>Whether or not an object is under conditional hold, preventing it from being deleted and its retention period from beginning. Default depends on the bucket's <var>ConditionalHold</var> setting.</td></tr>
+</table>
+(Note that there is also a read-only <var>Hash</var> field, containing an SHA-256 hash of the object that can be used to verify that it hasn't changed while under compliance.)
+</p>
+<p>
+When an object's bucket has compliance enabled, all objects in that bucket are under compliance, and you can query any object's compliance settings using the <var>GetCompliance</var> method.
+</p>
+<p>
+Any individual object can have its compliance settings updated as well. The <var>LegalHold</var> setting can be toggled to prevent (or allow) deletion; the object's <var>ConditionalHold</var>, if "true", can be released by setting to "false", at which time the object will begin its retention period. The object's <var>RetentionTime</var> can also be extended (but not reduced). For example, if you wanted to release an object from conditional hold:
+</p>
+<code lang="csharp">
+wasabi.Bucket = "MyBucket";
+wasabi.ObjectCompliance = new WasabiObjectCompliance("", "false", "");
+wasabi.UpdateCompliance("MyObject");
+</code>
+<p>
+<b>Further Information</b><br>
+Compliance is a powerful tool, but it must be handled carefully. These notes, and the documentation for the compliance-related properties, methods, and types, do not supercede Wasabi's documentation, and reviewing that documentation is highly recommended to gain a full understanding of how compliance works.
+</p>
+
+
+</page>

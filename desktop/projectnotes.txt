@@ -1,0 +1,50 @@
+Notes:
+
+We want implement a web service that accepts swagger.yaml files, and just like the online swagger editor, provides the user with the client side code necessary to use the desired api defined in the swagger file.
+
+InGoogle
+Some success here with GCalendar, I'm sure other apis from google will work just as easily.
+* GCalendar [o]	
+	- Success! "ConsoleApp8". Previously thought codegen issue where a type of "InlineResponse200" is returned instead of a named type is because APIGuru defined each response NOT with a reference to a named class but with a hardcoded 200 or 400/401/404 response. 
+	- Test cases available @ InAPI>tests
+* GContacts [?]
+	This api is implemented as a feed. Server responses return a JSON Object with a 'feed' field that contains a JSON Object. I would need to do further research on swagger file syntax and format to define a Feed class for the code generation system to work. Do not keep going with this, google is moving away from this API and will be using PeopleAPI instead. Note that the included project "ConsoleApp13" actually receives a valid response containing all of the contacts associated with the account, we just have to figure out a way to parse it. 
+* GData [x]
+* GDrive [x]
+* GMail [x]
+* GoogleRequest [x]
+* GSpreadsheets [x]
+* GStorage [x]
+
+InAmazon
+All API calls to amazon must include the signed request as an authorization header: http://docs.aws.amazon.com/general/latest/gr/sigv4-calculate-signature.html. Note API Gateway also requires this, so even though their api is readily available as a swagger file, we cant use it without some sort of client side impl of signing: http://docs.aws.amazon.com/apigateway/api-reference/signing-requests/
+* EC2 [x]
+* Glacier [x]
+* PAAPI [x]
+* S3 [x]
+* SES [x]
+* SNS [x]
+* SQS [x]
+
+PayPal
+Success with payments, they use a more object oriented model so client side code is uglier. Paypal Oauth is different from the standard flow. I have not had any success authenticating with our component. I was using cfApplication / cfWebServer client profile but there may be a better choice with a slightly different flow. Spencer says maybe try cfDevice? I have had success generating an OAuth access code (or some equivalent of an access code) just by using our WebForm component: 
+      SetupComponent(); webform.Accept = "application/json";
+      webform.AddFormVar("grant_type", "client_credentials");
+      webform.User = "ATPyhf8brtkDs--btkwSOGswKmni7yvpjP4w2G05ySG3OYScFUQgu-ZmyHagqY5PoHy28ElNc-qqqp-Y";
+      webform.Password = "EKqztL4BxOEKzX3-9rna_8WCobJkbrkxhkxlyuEhH3xFy2_kGe9NejM6F3iub1tYid-Yv2D-zBSuO2pz";
+      webform.SubmitTo("https://api.sandbox.paypal.com/v1/oauth2/token");
+They have no implementation is seems like for there to be a link between the authorization server and token server for Payments api. (There is for Identity API: https://developer.paypal.com/docs/api/auth-headers/)
+* Payments [o]
+* Invoices [...]
+
+Todo:
+
+slack sendgrid data.gov github trello twilio
+
+Notes:
+- "CS0542 Member names cannot be the same as their enclosing type" issue will halt building if swagger file defines a property with the same name as its enclosing object. Many api's return objects that have members with the same name as the object. Can we intelligently change variable names if that is the case?
+- Issues building generated code when class contains fields that have numbers for names or contain a hypen (ex: '0', '1', '2', 'date-min', 'date-max'...). NASA api returns 'patent' objects this way.
+
+Code generation:
+- command: java -jar modules\swagger-codegen-cli\target\swagger-codegen-cli.jar generate -i c:\Users\reese\Desktop\swagger\resources\paypal_swagger.yaml -l csharp -o c:\Users\reese\Desktop\swagger\resources\csharp-client-paypal
+- command: python ptengine.py Swagger_CS.pt -proj_name gcalendar -swagger_file gcalendar.json

@@ -1,0 +1,49 @@
+For server responses with a body, the generated client side code works.
+Swagger:
+      responses:
+        '200':
+          description: Client request successful
+          schema:
+            $ref: '#/definitions/InvoiceDetails'
+Is generated into:
+      if (apiclient.StatusCode == 200) {
+
+        return InvoiceDetails.LoadFromString(apiclient.TransferredData, "/", InputFormat);
+      }
+      throw new InAPIException(String.Format("Failed to get result. HTTP {0}: {1}.", apiclient.StatusCode, apiclient.StatusDescription));
+
+But with responses that return nothing, generated code throws an error on a successful api call.
+Swagger:
+      responses:
+        '202':
+          description: Client request successful
+turns into:
+      if (apiclient.StatusCode == 202) {
+        throw new InAPIException(String.Format("HTTP {0} error: Client request successful.", 202));
+      }
+
+      FlowConfig flow = new FlowConfig();
+      flow.Bank_txn_pending_url = "https://www.nsoftware.com";
+      flow.Landing_page_type = "Billing";
+      flow.User_action = "commit";
+      Presentation pres = new Presentation();
+      pres.Brand_name = "nvidia";
+      pres.Logo_image = "https://www.absolutereports.com/images/clients/59707459a5e4anvidia.jpg";
+      pres.Locale_code = "US";
+      InputFields inp = new InputFields();
+      inp.No_shipping = 1;
+      inp.Address_override = 0;
+      inp.Allow_note = true;
+
+      WebProfile nvid = new WebProfile();
+      nvid.Temporary = true;
+      nvid.Name = "nvidia";
+      nvid.Input_fields = inp;
+      nvid.Presentation = pres;
+      nvid.Flow_config = flow;
+      PaymentsApi pa = new PaymentsApi();
+      pa.CreateWebProfile(nvid);
+
+883e7d28-d432-4cd2-b0e0-7f2ee406fe2d
+hMLe4nAoiy4paUnMOt7AVK71kP8B2cAB+P171orm7fM=
+6ee709df-9de0-4cdf-8bc4-10e6b7a51d95

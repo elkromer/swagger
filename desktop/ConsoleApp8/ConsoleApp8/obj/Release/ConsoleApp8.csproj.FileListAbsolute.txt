@@ -1,0 +1,24 @@
+C:\Users\reese\Documents\Visual Studio 2017\Projects\ConsoleApp8\ConsoleApp8\bin\Release\ConsoleApp8.exe.config
+C:\Users\reese\Documents\Visual Studio 2017\Projects\ConsoleApp8\ConsoleApp8\bin\Release\ConsoleApp8.exe
+C:\Users\reese\Documents\Visual Studio 2017\Projects\ConsoleApp8\ConsoleApp8\bin\Release\ConsoleApp8.pdb
+C:\Users\reese\Documents\Visual Studio 2017\Projects\ConsoleApp8\ConsoleApp8\bin\Release\IO.Swagger.dll
+C:\Users\reese\Documents\Visual Studio 2017\Projects\ConsoleApp8\ConsoleApp8\bin\Release\Newtonsoft.Json.dll
+C:\Users\reese\Documents\Visual Studio 2017\Projects\ConsoleApp8\ConsoleApp8\bin\Release\RestSharp.dll
+C:\Users\reese\Documents\Visual Studio 2017\Projects\ConsoleApp8\ConsoleApp8\bin\Release\IO.Swagger.pdb
+C:\Users\reese\Documents\Visual Studio 2017\Projects\ConsoleApp8\ConsoleApp8\bin\Release\Newtonsoft.Json.xml
+C:\Users\reese\Documents\Visual Studio 2017\Projects\ConsoleApp8\ConsoleApp8\bin\Release\RestSharp.xml
+C:\Users\reese\Documents\Visual Studio 2017\Projects\ConsoleApp8\ConsoleApp8\obj\Release\ConsoleApp8.csprojResolveAssemblyReference.cache
+C:\Users\reese\Documents\Visual Studio 2017\Projects\ConsoleApp8\ConsoleApp8\obj\Release\ConsoleApp8.exe
+C:\Users\reese\Documents\Visual Studio 2017\Projects\ConsoleApp8\ConsoleApp8\obj\Release\ConsoleApp8.pdb
+C:\Users\reese\Desktop\swagger\ConsoleApp8\ConsoleApp8\obj\Release\ConsoleApp8.csprojResolveAssemblyReference.cache
+C:\Users\reese\Desktop\swagger\ConsoleApp8\ConsoleApp8\obj\Release\ConsoleApp8.exe
+C:\Users\reese\Desktop\swagger\ConsoleApp8\ConsoleApp8\obj\Release\ConsoleApp8.pdb
+C:\Users\reese\Desktop\swagger\ConsoleApp8\ConsoleApp8\bin\Release\ConsoleApp8.exe.config
+C:\Users\reese\Desktop\swagger\ConsoleApp8\ConsoleApp8\bin\Release\ConsoleApp8.exe
+C:\Users\reese\Desktop\swagger\ConsoleApp8\ConsoleApp8\bin\Release\ConsoleApp8.pdb
+C:\Users\reese\Desktop\swagger\ConsoleApp8\ConsoleApp8\bin\Release\IO.Swagger.dll
+C:\Users\reese\Desktop\swagger\ConsoleApp8\ConsoleApp8\bin\Release\Newtonsoft.Json.dll
+C:\Users\reese\Desktop\swagger\ConsoleApp8\ConsoleApp8\bin\Release\RestSharp.dll
+C:\Users\reese\Desktop\swagger\ConsoleApp8\ConsoleApp8\bin\Release\IO.Swagger.pdb
+C:\Users\reese\Desktop\swagger\ConsoleApp8\ConsoleApp8\bin\Release\Newtonsoft.Json.xml
+C:\Users\reese\Desktop\swagger\ConsoleApp8\ConsoleApp8\bin\Release\RestSharp.xml

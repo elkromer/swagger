@@ -1,0 +1,22 @@
+OpenAPI spec?
+Common public contract between services. Independent of language/framework. 
+
+'Components' now holds everything that is reusable:
+	schemas
+	responses
+	parameters
+	examples
+	requestBodies
+	headers
+	securitySchemes
+	links
+	callbacks
+
+Cookie parameter type
+Body parameter type removed->requestBody
+Requestbodies amd responses allow you to define different schemas and examples for diff media types
+eliminates produces/consumes from spec. 
+Callbacks at the path level
+links are relations between responses and other operations. Parameters can depend on both the request and response. Client can follow links automatically
+Examples can reference external examples and now have addtional metadata.
+Multiple and templated server definitions.
