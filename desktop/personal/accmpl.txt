@@ -1,23 +1,23 @@
-nsoftware is a network tools company with toolkits like:
+nsoftware is a network tools company with toolkits to help with common like:
 - Authentication: (IP*Works! Auth) secure client authorization and authentication components.
 	ex: HOTP creation, TOTP creation, LDAP, OAuth, OCRA, SAML, RADIUS
 - Encryption: (IP*Works! Encrpt) cryptography components to add encryption capabilities to any application
 	ex: EzCrypt, Hash, EzRand, AES, Blowfish, CAST, DSA, RC4, RSA, SMIME, TEA, Twofish
 - Secure Shell: (IP*Works! SSH) ssh enabled client communications components.
 	ex: SCP, SFTP, SShell, SSHTunnel, SSHReverseTunnel, SExec
-- Compression/Decompression: (IP*Works! Zip) components that enable comp/decomp functionality to any application
+- Compression/Decompression: (IP*Works! Zip) components that add compression functionality to any application
 	ex: Bzip2, Gzip, Jar, 7zip, Tar
 - and 29 more...
 
 During my internship, I became familiar with:
-- Coding demo applications and navigating the development environments of
-	Languages: Java, C#, vb, C++ Builder, aspx, Cocoa, jsp, nodejs, php, python, C, delphi
-	Example Demos: SNMP Manager, SNMP Agent, SNMP Trap Manager, SNMP Walk, SShell, Sftp, SSH Tunnel/Reverse Tunnel, Websocket Server, Websocket Client, EzRand, Hash, UDP communications/file transfer, SMPP SMS protocol, OAuth, SFTP, FTPS, JWT authentication, IPC Named-pipe interprocess communication
-- Integrating two-factor authentication software (our components, google-authenticator) into linux based sftp servers.
+- Coding demo applications for network toolkits and navigating the development environments of
+	Languages: Java, C#, vb, C++ Builder, aspx, Cocoa, jsp, nodejs, php, python, C, delphi, xamarin
+	Example Demos: SNMP Manager, SNMP Agent, SNMP Trap Manager, SNMP Walk, SShell, Sftp, SSH Tunnel/Reverse Tunnel, Websocket Server, Websocket Client, EzRand, Hash, UDP communications/file transfer, SMPP (SMS) protocol, OAuth, SFTP, FTPS, JWT authentication, IPC Named-pipe interprocess communication
 - Writing BugZilla reports
 - Writing knowledge base articles
-- Performance testing (C# .NET testing of Networking products: CPU, RAM, Bandwidth consumption)
-- OpenAPI 3.0, Swagger 2.0 specification.
-- Writing swagger files for companies that do not conform to the OpenAPI spec, generating client side code for them with swagger-codegen.
-- Integrating APIs into console applications. Had success with Paypal payments/invoices/paymentexperience/vault, Google Calendar/Contacts/Youtube Analytics, NYTimes, and Microsoft Graph.
-- Github & Tortoise SVN for software development. 
+- Performance testing (C# .NET testing of Networking toolkits: CPU, RAM, Bandwidth consumption)
+- Integrating two-factor authentication software (nsoftware components, google-authenticator) into linux based sftp servers.
+- Writing swagger in OpenAPI 3.0, Swagger 2.0 specification.
+- Writing swagger for companies that do not conform to OpenAPI specification and generating client side SDKs for them with swagger-codegen and nsoftware products.
+- Integrating client generated SDKs for APIs into console applications. Had success with Paypal payments/invoices/paymentexperience/vault, Google Calendar/Contacts/Youtube Analytics, Github, NASA APOD/MarsRover/Sounds/EPIC/EONET/Earth, and Microsoft Graph.
+- Git & Tortoise SVN. 
